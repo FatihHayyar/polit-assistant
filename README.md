@@ -37,46 +37,60 @@ The application automatically imports new parliamentary affairs, downloads relat
 # Architecture
 
 ```text
-                    +------------------+
-                    | OpenParlData API |
-                    +---------+--------+
-                              |
-                              |
-                    OpenParlData Adapter
-                              |
-                              |
-                     Import Service (JDBC)
-                              |
-                              |
-                        PostgreSQL
-                              |
-         +--------------------+--------------------+
-         |                    |                    |
-         |                    |                    |
- Classification         Search API (JPA)      Alert Engine
-         |                    |                    |
-         +--------------------+--------------------+
-                              |
-                      Teams / Outlook
+                                        +----------------------+
+                    |   OpenParlData API   |
+                    +----------+-----------+
+                               |
+                               v
+                  OpenParlData Adapter (REST)
+                               |
+                               v
+                  Import Orchestrator Service
+                               |
+          +--------------------+----------------------+
+          |                    |                      |
+          v                    v                      v
+   Import Service       Classification        Alert Service
+      (JDBC)               Engine                 |
+          |                                       v
+          |                              Notification Service
+          |                                       |
+          |                               Notification Port
+          |                                       |
+          |                     +-----------------+----------------+
+          |                     |                                  |
+          v                     v                                  v
+     PostgreSQL       Teams Notification Adapter          Outlook Adapter
+          |
+          +-----------------------------------------------+
+                          |
+                    Search API (JPA + PostgreSQL FTS)
 ```
 
 ---
 
 # Implemented Features
 
-- ✅ OpenParlData integration
-- ✅ Affairs import
-- ✅ Documents import
-- ✅ Raw JSON storage
-- ✅ Normalized database model
+- ✅ OpenParlData REST integration
+- ✅ Full and incremental affairs import
+- ✅ Parliamentary document import
+- ✅ Raw JSON persistence
+- ✅ Normalized PostgreSQL data model
+- ✅ Flyway database migrations
+- ✅ Scheduler for automated imports
+- ✅ Import job tracking
+- ✅ Sync state tracking for incremental imports
 - ✅ Rule-based topic classification
-- ✅ Search REST API
-- ✅ Scheduler
-- ✅ Import job logging
+- ✅ Configurable classification rules (application.yml)
 - ✅ Alert generation
-- ✅ Notification lifecycle: PENDING → SENT
-- ✅ Notification port/adapter architecture
-- ✅ Mock Teams notification adapter
+- ✅ Notification pipeline
+- ✅ Teams notification adapter (mock)
+- ✅ PostgreSQL Full-Text Search (GIN + tsvector)
+- ✅ Search by keyword
+- ✅ Search by topic
+- ✅ Pagination (limit / offset)
+- ✅ Docker & Docker Compose
+- ✅ GitHub Actions CI
 - 🚧 Real Teams webhook integration
 - 🚧 Outlook integration
 - 🚧 SharePoint integration
@@ -137,15 +151,27 @@ http://localhost:8080/actuator/health
 ## Import
 
 ```
-POST /api/v1/dev/import/affairs/full?offset=0&limit=5
+## Import
+
+Full import
+
+POST /api/v1/dev/import/affairs/full?offset=0&limit=50
+
+Incremental import
+
+POST /api/v1/dev/import/affairs/incremental?limit=50
 ```
 
 ## Search
 
 ```
+GET /api/v1/affairs?q=Verkehr
+
 GET /api/v1/affairs?topic=ENERGY
 
-GET /api/v1/affairs?q=Elektrizität
+GET /api/v1/affairs?q=Verkehr&topic=MOBILITY
+
+GET /api/v1/affairs?q=Verkehr&topic=MOBILITY&limit=20&offset=0
 ```
 
 ## Pending Alerts
@@ -175,16 +201,33 @@ Current version
 v0.1.0
 ```
 
-The backend foundation has been completed.
+Backend MVP completed.
+
+Implemented:
+
+- OpenParlData ingestion
+- Incremental synchronization
+- PostgreSQL full-text search
+- Topic classification
+- Alert generation
+- Notification architecture
+- REST API
+- Docker deployment
+- GitHub Actions CI
+
+The remaining work mainly focuses on Microsoft 365 integration and AI-powered features.
 
 Upcoming milestones
 
-1. Incremental import
-2. Configurable classification rules
-3. PostgreSQL full-text search
-4. Notification retry handling
-5. Real Microsoft Teams webhook integration
-6. Outlook notification integration
-7. SharePoint / Microsoft Lists integration
-8. AI-based classification
-9. Chatbot / Copilot integration
+## Phase 1
+
+- Microsoft Teams Webhook
+- Outlook notifications
+- SharePoint integration
+- Notification retry mechanism
+
+## Phase 2
+
+- AI-assisted topic classification
+- AI chatbot / Copilot integration
+- Semantic search
