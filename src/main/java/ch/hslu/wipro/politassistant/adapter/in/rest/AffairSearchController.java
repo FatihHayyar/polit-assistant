@@ -2,6 +2,7 @@ package ch.hslu.wipro.politassistant.adapter.in.rest;
 
 import ch.hslu.wipro.politassistant.adapter.in.rest.dto.AffairSummaryResponse;
 import ch.hslu.wipro.politassistant.adapter.out.persistence.affair.AffairReadJpaRepository;
+import ch.hslu.wipro.politassistant.adapter.out.persistence.affair.AffairSearchJdbcRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,18 +12,25 @@ import java.util.List;
 class AffairSearchController {
 
     private final AffairReadJpaRepository repository;
-
-    AffairSearchController(AffairReadJpaRepository repository) {
+    private final AffairSearchJdbcRepository fullTextRepository;
+    AffairSearchController(AffairReadJpaRepository repository, AffairSearchJdbcRepository fullTextRepository) {
         this.repository = repository;
+        this.fullTextRepository = fullTextRepository;
     }
 
     @GetMapping
-    List<AffairSummaryResponse> search(
+    public List<AffairSummaryResponse> search(
             @RequestParam(required = false) String topic,
-            @RequestParam(required = false) String q
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "0") int offset
     ) {
-        String cleanTopic = topic == null || topic.isBlank() ? null : topic;
-        String cleanQ = q == null || q.isBlank() ? null : q;
-        return repository.search(cleanTopic, cleanQ);
+        if (q != null && !q.isBlank()) {
+            return fullTextRepository.fullTextSearch(q, topic, limit, offset);
+        }
+
+        return fullTextRepository.filterByTopic(topic, limit, offset);
+
     }
+
 }

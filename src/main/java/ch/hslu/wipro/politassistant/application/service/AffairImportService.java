@@ -18,23 +18,21 @@ public class AffairImportService {
     private final AffairStorePort affairStorePort;
     private final OpenParlDataAffairMapper mapper;
     private final AffairDocJdbcRepository docRepository;
-    private final RuleBasedClassificationService classificationService;
-    private final AlertService alertService;
+
+
     public AffairImportService(
             OpenParlDataClient openParlDataClient,
             RawAffairJdbcRepository rawRepository,
             AffairStorePort affairStorePort,
             OpenParlDataAffairMapper mapper,
-            AffairDocJdbcRepository docRepository,
-            RuleBasedClassificationService classificationService, AlertService alertService
+            AffairDocJdbcRepository docRepository
+
     ) {
         this.openParlDataClient = openParlDataClient;
         this.rawRepository = rawRepository;
         this.affairStorePort = affairStorePort;
         this.mapper = mapper;
         this.docRepository = docRepository;
-        this.classificationService = classificationService;
-        this.alertService = alertService;
     }
 
     @Transactional
@@ -69,18 +67,84 @@ public class AffairImportService {
     }
 
     @Transactional
-    public FullImportResult importAffairsWithDocs(int offset, int limit) {
+    public ImportOrchestratorService.ImportResult importAffairsWithDocsOnly(int offset, int limit) {
+        java.time.LocalDateTime maxUpdatedAt = null;
         var response = openParlDataClient.fetchAffairs(offset, limit);
-
         if (response == null || response.data() == null) {
-            return new FullImportResult(0, 0, 0, 0);
+            return new ImportOrchestratorService.ImportResult(
+                    0,
+                    0,
+                    new java.util.ArrayList<>(),
+                    null
+            );
         }
 
         int affairsImported = 0;
         int docsImported = 0;
-        var importedAffairIds = new ArrayList<Long>();
+        var importedAffairIds = new java.util.ArrayList<Long>();
 
         for (var dto : response.data()) {
+            rawRepository.upsert(dto.id(), dto);
+            affairStorePort.upsert(mapper.toDomain(dto));
+            affairsImported++;
+            importedAffairIds.add(dto.id());
+            var updatedAt = java.time.LocalDateTime.parse(dto.updated_at());
+            if (maxUpdatedAt == null || updatedAt.isAfter(maxUpdatedAt)) {
+                maxUpdatedAt = updatedAt;
+            }
+            var docsResponse = openParlDataClient.fetchDocsForAffair(dto.id());
+
+            if (docsResponse != null && docsResponse.data() != null) {
+                for (var doc : docsResponse.data()) {
+                    docRepository.upsert(doc);
+                    docsImported++;
+                }
+            }
+        }
+
+        return new ImportOrchestratorService.ImportResult(
+                affairsImported,
+                docsImported,
+                importedAffairIds,
+                maxUpdatedAt
+        );
+    }
+    @Transactional
+    public ImportOrchestratorService.ImportResult importLatestAffairsOnly(
+            int limit,
+            java.time.LocalDateTime lastSync
+    ) {
+        var response = openParlDataClient.fetchLatestAffairs(limit);
+
+        if (response == null || response.data() == null) {
+            return new ImportOrchestratorService.ImportResult(
+                    0,
+                    0,
+                    new java.util.ArrayList<>(),
+                    null
+            );
+        }
+
+        int affairsImported = 0;
+        int docsImported = 0;
+        var importedAffairIds = new java.util.ArrayList<Long>();
+        java.time.LocalDateTime maxUpdatedAt = null;
+
+        for (var dto : response.data()) {
+            if (dto.updated_at() == null || dto.updated_at().isBlank()) {
+                continue;
+            }
+
+            var updatedAt = java.time.LocalDateTime.parse(dto.updated_at());
+
+            if (lastSync != null && !updatedAt.isAfter(lastSync)) {
+                break;
+            }
+
+            if (maxUpdatedAt == null || updatedAt.isAfter(maxUpdatedAt)) {
+                maxUpdatedAt = updatedAt;
+            }
+
             rawRepository.upsert(dto.id(), dto);
             affairStorePort.upsert(mapper.toDomain(dto));
             affairsImported++;
@@ -96,16 +160,11 @@ public class AffairImportService {
             }
         }
 
-        int classified = classificationService.classifyAll(importedAffairIds);
-        int alertsCreated = alertService.createAlertsForImportedAffairs(importedAffairIds);
-
-        return new FullImportResult(affairsImported, docsImported, classified, alertsCreated);
+        return new ImportOrchestratorService.ImportResult(
+                affairsImported,
+                docsImported,
+                importedAffairIds,
+                maxUpdatedAt
+        );
     }
-
-    public record FullImportResult(
-            int affairsImported,
-            int docsImported,
-            int classified,
-            int alertsCreated
-    ) {}
 }

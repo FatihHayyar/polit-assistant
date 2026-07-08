@@ -45,4 +45,36 @@ public interface AffairReadJpaRepository extends JpaRepository<AffairEntity, Lon
     WHERE a.id = :id
     """)
     List<AffairSummaryResponse> findSummaryById(@Param("id") Long id);
+    @Query(value = """
+SELECT
+    a.id,
+    a.title_de,
+    a.type_name_de,
+    a.state_name_de,
+    c.topic,
+    c.confidence,
+    a.begin_date,
+    a.url_external_de
+FROM affairs a
+LEFT JOIN affair_classifications c
+ON c.affair_id = a.id
+WHERE
+    (:topic IS NULL OR c.topic = :topic)
+AND
+(
+    :q IS NULL
+    OR
+    a.search_vector @@ websearch_to_tsquery('german', :q)
+)
+ORDER BY
+ts_rank(
+    a.search_vector,
+    websearch_to_tsquery('german', :q)
+) DESC
+""",
+            nativeQuery = true)
+    List<Object[]> searchFullText(
+            @Param("topic") String topic,
+            @Param("q") String q
+    );
 }

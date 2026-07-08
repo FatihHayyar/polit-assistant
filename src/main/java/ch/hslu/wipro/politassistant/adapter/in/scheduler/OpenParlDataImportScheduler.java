@@ -1,7 +1,8 @@
 package ch.hslu.wipro.politassistant.adapter.in.scheduler;
 
-import ch.hslu.wipro.politassistant.application.service.AffairImportService;
+
 import ch.hslu.wipro.politassistant.application.service.ImportJobService;
+import ch.hslu.wipro.politassistant.application.service.ImportOrchestratorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,11 +13,13 @@ public class OpenParlDataImportScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(OpenParlDataImportScheduler.class);
     private final ImportJobService importJobService;
-    private final AffairImportService importService;
-
-    public OpenParlDataImportScheduler(ImportJobService importJobService, AffairImportService importService) {
+    private final ImportOrchestratorService orchestratorService;
+    public OpenParlDataImportScheduler(
+            ImportJobService importJobService,
+            ImportOrchestratorService orchestratorService
+    ) {
         this.importJobService = importJobService;
-        this.importService = importService;
+        this.orchestratorService = orchestratorService;
     }
 
 
@@ -25,7 +28,7 @@ public class OpenParlDataImportScheduler {
         var jobId = importJobService.start("OPENPARLDATA_AFFAIRS_FULL_IMPORT");
 
         try {
-            var result = importService.importAffairsWithDocs(0, 50);
+            var result = orchestratorService.runIncrementalImport(50);
 
             importJobService.success(
                     jobId,

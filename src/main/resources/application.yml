@@ -26,3 +26,71 @@ management:
         enabled: true
 openparldata:
   base-url: https://api.openparldata.ch
+
+notification:
+  teams:
+    webhook-url:
+
+classification:
+  rules:
+    ENERGY:
+      - energie
+      - strom
+      - elektrizität
+      - solar
+      - photovoltaik
+      - wind
+      - wasserkraft
+
+    BIODIVERSITY:
+      - biodiversität
+      - artenvielfalt
+      - schutzgebiet
+      - ökosystem
+      - wald
+      - insekten
+
+    WATER:
+      - wasser
+      - gewässer
+      - fluss
+      - see
+      - abwasser
+      - renaturierung
+
+    AGRICULTURE:
+      - landwirtschaft
+      - pestizid
+      - boden
+      - tierhaltung
+      - dünger
+
+    SPATIAL_PLANNING:
+      - raumplanung
+      - bauzone
+      - verdichtung
+      - siedlung
+      - landschaftsschutz
+
+    CLIMATE:
+      - klima
+      - co2
+      - treibhausgas
+      - emission
+      - klimaschutz
+
+    MOBILITY:
+      - verkehr
+      - mobilität
+      - öffentlicher verkehr
+      - öv
+      - bahn
+      - veloverkehr
+      - velo
+
+    WASTE:
+      - abfall
+      - recycling
+      - plastik
+      - kunststoff
+      - kreislaufwirtschaft

@@ -13,13 +13,14 @@ public class AlertService {
 
     private final AlertJpaRepository alertRepository;
     private final AffairReadJpaRepository affairRepository;
-
+    private final NotificationService notificationService;
     public AlertService(
             AlertJpaRepository alertRepository,
-            AffairReadJpaRepository affairRepository
+            AffairReadJpaRepository affairRepository, NotificationService notificationService
     ) {
         this.alertRepository = alertRepository;
         this.affairRepository = affairRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -71,5 +72,19 @@ public class AlertService {
         }
 
         return created;
+    }
+    @Transactional
+    public int sendPendingAlerts() {
+        var pendingAlerts = alertRepository.findByStatus("PENDING");
+
+        int sent = 0;
+
+        for (var alert : pendingAlerts) {
+            notificationService.notify(alert);
+            alert.markSent();
+            sent++;
+        }
+
+        return sent;
     }
 }

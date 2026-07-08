@@ -1,5 +1,5 @@
 package ch.hslu.wipro.politassistant.adapter.in.rest;
-
+import ch.hslu.wipro.politassistant.application.service.ImportOrchestratorService;
 import ch.hslu.wipro.politassistant.application.service.AffairImportService;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.*;
 class AffairImportDevController {
 
     private final AffairImportService importService;
+    private final ImportOrchestratorService orchestratorService;
 
-    AffairImportDevController(AffairImportService importService) {
+    AffairImportDevController(
+            AffairImportService importService,
+            ImportOrchestratorService orchestratorService
+    ) {
         this.importService = importService;
+        this.orchestratorService = orchestratorService;
     }
 
     @PostMapping("/affairs")
@@ -31,10 +36,16 @@ class AffairImportDevController {
     }
 
     @PostMapping("/affairs/full")
-    AffairImportService.FullImportResult importAffairsFull(
+    ImportOrchestratorService.FullImportResult importAffairsFull(
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "5") int limit
     ) {
-        return importService.importAffairsWithDocs(offset, limit);
+        return orchestratorService.runFullImport(offset, limit);
+    }
+    @PostMapping("/affairs/incremental")
+    ImportOrchestratorService.FullImportResult importIncremental(
+            @RequestParam(defaultValue = "50") int limit
+    ) {
+        return orchestratorService.runIncrementalImport(limit);
     }
 }
