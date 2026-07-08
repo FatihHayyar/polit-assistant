@@ -74,9 +74,13 @@ The application automatically imports new parliamentary affairs, downloads relat
 - ✅ Scheduler
 - ✅ Import job logging
 - ✅ Alert generation
-- 🚧 Teams integration
+- ✅ Notification lifecycle: PENDING → SENT
+- ✅ Notification port/adapter architecture
+- ✅ Mock Teams notification adapter
+- 🚧 Real Teams webhook integration
 - 🚧 Outlook integration
-- 🚧 AI Assistant
+- 🚧 SharePoint integration
+- 🚧 AI Assistant / Chatbot
 
 ---
 
@@ -175,8 +179,12 @@ The backend foundation has been completed.
 
 Upcoming milestones
 
-- Microsoft Teams notifications
-- Outlook notifications
-- SharePoint integration
-- AI-based classification
-- Chatbot integration
+1. Incremental import
+2. Configurable classification rules
+3. PostgreSQL full-text search
+4. Notification retry handling
+5. Real Microsoft Teams webhook integration
+6. Outlook notification integration
+7. SharePoint / Microsoft Lists integration
+8. AI-based classification
+9. Chatbot / Copilot integration
