@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: polit-assistant
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/polit_assistant
+    username: polit
+    password: polit_dev_password
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+openparldata:
+  base-url: https://api.openparldata.ch
