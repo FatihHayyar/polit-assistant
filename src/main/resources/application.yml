@@ -37,6 +37,9 @@ classification:
       - energie
       - strom
       - elektrizität
+      - electricity
+      - electric
+      - électricité
       - solar
       - photovoltaik
       - wind
@@ -52,6 +55,8 @@ classification:
 
     WATER:
       - wasser
+      - eau
+      - acqua
       - gewässer
       - fluss
       - see
@@ -87,6 +92,8 @@ classification:
       - bahn
       - veloverkehr
       - velo
+      - mobilité
+      - trasporto
 
     WASTE:
       - abfall

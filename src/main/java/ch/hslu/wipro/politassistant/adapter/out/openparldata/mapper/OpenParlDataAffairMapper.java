@@ -17,22 +17,31 @@ public class OpenParlDataAffairMapper {
                 dto.body_id(),
                 dto.external_id(),
                 dto.number(),
-                value(dto.title(), "de"),
-                value(dto.title_long(), "de"),
-                value(dto.type_name(), "de"),
-                value(dto.type_harmonized(), "de"),
-                value(dto.state_name(), "de"),
+                value(dto.title()),
+                value(dto.title_long()),
+                value(dto.type_name()),
+                value(dto.type_harmonized()),
+                value(dto.state_name()),
                 parse(dto.begin_date()),
                 parse(dto.end_date()),
                 parse(dto.created_at()),
                 parse(dto.updated_at()),
                 dto.url_api(),
-                value(dto.url_external(), "de")
+                value(dto.url_external())
         );
     }
 
-    private String value(Map<String, String> map, String key) {
-        return map == null ? null : map.get(key);
+    private String value(Map<String, String> map) {
+        if (map == null || map.isEmpty()) {
+            return null;
+        }
+
+        if (map.get("de") != null) return map.get("de");
+        if (map.get("fr") != null) return map.get("fr");
+        if (map.get("it") != null) return map.get("it");
+        if (map.get("en") != null) return map.get("en");
+
+        return map.values().stream().findFirst().orElse(null);
     }
 
     private LocalDateTime parse(String value) {

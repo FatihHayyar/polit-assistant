@@ -51,57 +51,86 @@ The application automatically imports new parliamentary affairs, downloads relat
           |                    |                      |
           v                    v                      v
    Import Service       Classification        Alert Service
-      (JDBC)               Engine                 |
-          |                                       |
-          |                               User Preferences
-          |                                       |
-          |                                       v
-          |                               Notification Service
-          |                                       |
-          |                              Notification Port
-          |                                       |
-          |                     +-----------------+----------------+
-          |                     |                                  |
-          v                     v                                  v
-     PostgreSQL       Teams Notification Adapter       Outlook Adapter (planned)
+      (JDBC)               Engine                     |
+          |                                           |
+          |                                   User Preferences
+          |                                           |
+          |                                           v
+          |                                   Notification Service
+          |                                           |
+          |                                   Notification Dispatcher
+          |                                           |
+          |                         +-----------------+----------------+
+          |                         |                                  |
+          v                         v                                  v
+     PostgreSQL           Teams Notification Adapter            Outlook Adapter 
           |
-          +-----------------------------------------------+
-                          |
-                    Search API (PostgreSQL FTS)
+          +------------------------------------------------------------+
+                                         |
+                                 Search API (PostgreSQL FTS)
+                                         |
+                                         v
+                                   Chat Service
+                                         |
+                                         v
+                                   Chat REST API
 ```
 
 ---
 
 # Implemented Features
 
+## Data Integration
+
 - ✅ OpenParlData REST integration
-- ✅ Full and incremental affairs import
+- ✅ Full import
+- ✅ Incremental import
 - ✅ Parliamentary document import
+- ✅ Sync state tracking
+
+## Data Management
+
+- ✅ PostgreSQL
+- ✅ Flyway
 - ✅ Raw JSON persistence
-- ✅ Normalized PostgreSQL data model
-- ✅ Flyway database migrations
+- ✅ Normalized database model
 - ✅ Scheduler for automated imports
-- ✅ Import job tracking
-- ✅ Sync state tracking for incremental imports
+
+## Search
+
+- ✅ PostgreSQL Full-Text Search
+- ✅ Topic search
+- ✅ Keyword search
+- ✅ Pagination
+
+## Classification
+
 - ✅ Rule-based topic classification
-- ✅ Configurable classification rules (application.yml)
+- ✅ Configurable YAML rules
+- ✅ Confidence score
+
+## Notifications
+
 - ✅ Alert generation
-- ✅ Notification pipeline
-- ✅ Teams notification adapter (mock)
-- ✅ PostgreSQL Full-Text Search (GIN + tsvector)
-- ✅ Search by keyword
-- ✅ Search by topic
-- ✅ Pagination (limit / offset)
-- ✅ Docker & Docker Compose
-- ✅ GitHub Actions CI
 - ✅ User preferences
-- ✅ Recipient-specific alerts
-- ✅ Multi-channel notification architecture
-- ✅ Notification retry mechanism
-- 🚧 Real Teams webhook integration
-- 🚧 Outlook integration
-- 🚧 SharePoint integration
-- 🚧 AI Assistant / Chatbot
+- ✅ Recipient-specific notifications
+- ✅ Notification retry
+- ✅ Multi-channel notification dispatcher
+- ✅ Teams adapter (mock)
+- ✅ Outlook adapter (mock)
+
+## Chat
+
+- ✅ Chat endpoint
+- ✅ Intent parser
+- ✅ Chatbot-ready API
+
+## DevOps
+
+- ✅ Docker
+- ✅ Docker Compose
+- ✅ GitHub Actions
+- ✅ Swagger / OpenAPI
 
 ---
 
@@ -192,6 +221,35 @@ GET /api/v1/dev/alerts/pending
 
 POST /api/v1/dev/alerts/send-pending
 
+## User Preferences
+
+Add preference:
+
+POST /api/v1/dev/users/preferences
+
+Example body:
+
+{
+"email": "test@hslu.ch",
+"displayName": "Test User",
+"topic": "ENERGY",
+"channel": "OUTLOOK"
+}
+
+## List preferences:
+
+GET /api/v1/dev/users/preferences
+
+## Chat
+
+POST /api/v1/chat
+
+{
+"question":"Show me all energy affairs"
+}
+
+## Dachboard
+GET /api/v1/dev/dashboard/summary
 
 # Continuous Integration
 
@@ -216,28 +274,18 @@ Backend MVP completed.
 
 Implemented:
 
-- OpenParlData ingestion
+- OpenParlData monitoring
 - Incremental synchronization
-- PostgreSQL full-text search
-- Topic classification
-- Alert generation
-- Notification architecture
-- REST API
+- Rule-based topic classification
+- PostgreSQL Full-Text Search
+- Chatbot-ready REST API
+- User preference management
+- Multi-channel notification architecture
 - Docker deployment
-- GitHub Actions CI
+- CI/CD pipeline
 
-The remaining work mainly focuses on Microsoft 365 integration and AI-powered features.
+Remaining work:
 
-Upcoming milestones
-
-## Phase 1
-
-- Microsoft Teams Webhook
-- Outlook notifications
-- SharePoint integration
-
-## Phase 2
-
-- AI-assisted topic classification
-- AI chatbot / Copilot integration
-- Semantic search
+- Real Microsoft 365 integration
+- AI-powered classification
+- Copilot integration

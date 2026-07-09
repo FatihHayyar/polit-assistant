@@ -7,6 +7,11 @@ import java.util.UUID;
 
 public interface UserPreferenceJpaRepository
         extends JpaRepository<UserPreferenceEntity, UUID> {
-
+    long countByActiveTrue();
     List<UserPreferenceEntity> findByTopicAndActiveTrue(String topic);
+    boolean existsByUserEmailAndTopicAndChannel(
+            String email,
+            String topic,
+            String channel
+    );
 }

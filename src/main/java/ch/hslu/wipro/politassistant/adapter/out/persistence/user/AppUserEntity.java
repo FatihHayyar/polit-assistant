@@ -29,4 +29,14 @@ public class AppUserEntity {
     public String getEmail() { return email; }
     public String getDisplayName() { return displayName; }
     public boolean isActive() { return active; }
+
+    public static AppUserEntity create(String email, String displayName) {
+        AppUserEntity user = new AppUserEntity();
+        user.id = UUID.randomUUID();
+        user.email = email;
+        user.displayName = displayName;
+        user.active = true;
+        user.createdAt = LocalDateTime.now();
+        return user;
+    }
 }

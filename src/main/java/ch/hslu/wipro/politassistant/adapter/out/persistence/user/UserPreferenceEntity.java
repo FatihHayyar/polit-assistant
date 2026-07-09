@@ -38,4 +38,18 @@ public class UserPreferenceEntity {
     public String getEmail() {
         return user.getEmail();
     }
+    public static UserPreferenceEntity create(
+            AppUserEntity user,
+            String topic,
+            String channel
+    ) {
+        UserPreferenceEntity preference = new UserPreferenceEntity();
+        preference.id = UUID.randomUUID();
+        preference.user = user;
+        preference.topic = topic;
+        preference.channel = channel;
+        preference.active = true;
+        preference.createdAt = LocalDateTime.now();
+        return preference;
+    }
 }

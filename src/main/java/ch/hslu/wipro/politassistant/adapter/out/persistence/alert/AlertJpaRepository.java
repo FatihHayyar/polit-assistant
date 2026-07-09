@@ -13,7 +13,7 @@ public interface AlertJpaRepository extends JpaRepository<AlertEntity, UUID> {
             String channel,
             String recipientEmail
     );
-
+    long countByStatus(String status);
     List<AlertEntity> findByStatus(String status);
     List<AlertEntity> findByStatusInAndRetryCountLessThan(List<String> statuses, int retryCount);
 }
