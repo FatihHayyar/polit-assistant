@@ -1,23 +1,24 @@
 package ch.hslu.wipro.politassistant.adapter.in.rest;
 
 import ch.hslu.wipro.politassistant.adapter.in.rest.dto.AffairSummaryResponse;
-import ch.hslu.wipro.politassistant.adapter.out.persistence.affair.AffairReadJpaRepository;
 import ch.hslu.wipro.politassistant.adapter.out.persistence.affair.AffairSearchJdbcRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Tag(name = "Affairs", description = "Search and filter parliamentary affairs")
 @RestController
 @RequestMapping("/api/v1/affairs")
 class AffairSearchController {
 
-    private final AffairReadJpaRepository repository;
-    private final AffairSearchJdbcRepository fullTextRepository;
-    AffairSearchController(AffairReadJpaRepository repository, AffairSearchJdbcRepository fullTextRepository) {
-        this.repository = repository;
-        this.fullTextRepository = fullTextRepository;
+    private final AffairSearchJdbcRepository searchRepository;
+
+    AffairSearchController(AffairSearchJdbcRepository searchRepository) {
+        this.searchRepository = searchRepository;
     }
 
+    @Operation(summary = "Search parliamentary affairs")
     @GetMapping
     public List<AffairSummaryResponse> search(
             @RequestParam(required = false) String topic,
@@ -26,11 +27,9 @@ class AffairSearchController {
             @RequestParam(defaultValue = "0") int offset
     ) {
         if (q != null && !q.isBlank()) {
-            return fullTextRepository.fullTextSearch(q, topic, limit, offset);
+            return searchRepository.fullTextSearch(q, topic, limit, offset);
         }
 
-        return fullTextRepository.filterByTopic(topic, limit, offset);
-
+        return searchRepository.filterByTopic(topic, limit, offset);
     }
-
 }

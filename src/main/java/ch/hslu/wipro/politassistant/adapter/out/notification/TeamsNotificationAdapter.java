@@ -29,15 +29,18 @@ public class TeamsNotificationAdapter implements NotificationPort {
     @Override
     public void send(Notification notification) {
         String text = """
-                **%s**
+        **%s**
 
-                Topic: %s
+        Recipient: %s
+        Channel: %s
+        Topic: %s
+        Affair ID: %s
 
-                Affair ID: %s
-
-                %s
-                """.formatted(
+        %s
+        """.formatted(
                 notification.title(),
+                notification.recipientEmail(),
+                notification.channel(),
                 notification.topic(),
                 notification.affairId(),
                 notification.message()

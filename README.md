@@ -37,7 +37,7 @@ The application automatically imports new parliamentary affairs, downloads relat
 # Architecture
 
 ```text
-                                        +----------------------+
+                    +----------------------+
                     |   OpenParlData API   |
                     +----------+-----------+
                                |
@@ -52,19 +52,22 @@ The application automatically imports new parliamentary affairs, downloads relat
           v                    v                      v
    Import Service       Classification        Alert Service
       (JDBC)               Engine                 |
-          |                                       v
-          |                              Notification Service
           |                                       |
-          |                               Notification Port
+          |                               User Preferences
+          |                                       |
+          |                                       v
+          |                               Notification Service
+          |                                       |
+          |                              Notification Port
           |                                       |
           |                     +-----------------+----------------+
           |                     |                                  |
           v                     v                                  v
-     PostgreSQL       Teams Notification Adapter          Outlook Adapter
+     PostgreSQL       Teams Notification Adapter       Outlook Adapter (planned)
           |
           +-----------------------------------------------+
                           |
-                    Search API (JPA + PostgreSQL FTS)
+                    Search API (PostgreSQL FTS)
 ```
 
 ---
@@ -91,6 +94,10 @@ The application automatically imports new parliamentary affairs, downloads relat
 - ✅ Pagination (limit / offset)
 - ✅ Docker & Docker Compose
 - ✅ GitHub Actions CI
+- ✅ User preferences
+- ✅ Recipient-specific alerts
+- ✅ Multi-channel notification architecture
+- ✅ Notification retry mechanism
 - 🚧 Real Teams webhook integration
 - 🚧 Outlook integration
 - 🚧 SharePoint integration
@@ -181,6 +188,10 @@ GET /api/v1/dev/alerts/pending
 ```
 
 ---
+### Send pending notifications
+
+POST /api/v1/dev/alerts/send-pending
+
 
 # Continuous Integration
 
@@ -224,7 +235,6 @@ Upcoming milestones
 - Microsoft Teams Webhook
 - Outlook notifications
 - SharePoint integration
-- Notification retry mechanism
 
 ## Phase 2
 

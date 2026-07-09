@@ -33,4 +33,5 @@ public class AffairEntity {
     public String getStateNameDe() { return stateNameDe; }
     public LocalDateTime getBeginDate() { return beginDate; }
     public String getUrlExternalDe() { return urlExternalDe; }
+
 }

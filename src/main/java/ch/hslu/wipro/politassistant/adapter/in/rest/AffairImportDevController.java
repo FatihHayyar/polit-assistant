@@ -1,8 +1,10 @@
 package ch.hslu.wipro.politassistant.adapter.in.rest;
 import ch.hslu.wipro.politassistant.application.service.ImportOrchestratorService;
 import ch.hslu.wipro.politassistant.application.service.AffairImportService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-
+@Tag(name = "Import", description = "Development endpoints for OpenParlData import")
 @RestController
 @RequestMapping("/api/v1/dev/import")
 class AffairImportDevController {
@@ -17,7 +19,9 @@ class AffairImportDevController {
         this.importService = importService;
         this.orchestratorService = orchestratorService;
     }
-
+    @Operation(
+            summary = "Run incremental import"
+    )
     @PostMapping("/affairs")
     ImportResult importAffairs(
             @RequestParam(defaultValue = "0") int offset,
@@ -34,7 +38,9 @@ class AffairImportDevController {
         int imported = importService.importDocsForAffair(id);
         return new ImportResult(imported);
     }
-
+    @Operation(
+            summary = "Run full import"
+    )
     @PostMapping("/affairs/full")
     ImportOrchestratorService.FullImportResult importAffairsFull(
             @RequestParam(defaultValue = "0") int offset,
