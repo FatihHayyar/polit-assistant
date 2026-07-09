@@ -1,7 +1,8 @@
 package ch.hslu.wipro.politassistant.adapter.out.notification;
 
-import ch.hslu.wipro.politassistant.application.port.out.NotificationPort;
+import ch.hslu.wipro.politassistant.application.port.out.NotificationSender;
 import ch.hslu.wipro.politassistant.domain.notification.Notification;
+import ch.hslu.wipro.politassistant.domain.notification.NotificationChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,7 @@ import org.springframework.web.client.RestClient;
 import java.util.Map;
 
 @Component
-public class TeamsNotificationAdapter implements NotificationPort {
+public class TeamsNotificationAdapter implements NotificationSender {
 
     private static final Logger log = LoggerFactory.getLogger(TeamsNotificationAdapter.class);
 
@@ -61,5 +62,9 @@ public class TeamsNotificationAdapter implements NotificationPort {
                 .body(Map.of("text", text))
                 .retrieve()
                 .toBodilessEntity();
+    }
+    @Override
+    public NotificationChannel channel() {
+        return NotificationChannel.TEAMS;
     }
 }
