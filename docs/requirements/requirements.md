@@ -43,3 +43,10 @@ The system shall detect new parliamentary affairs that match relevant WWF enviro
 ### FR-08 – Session Agenda Monitoring
 
 The system shall identify relevant parliamentary affairs appearing on parliamentary session agendas.
+### FR-09 – Topic Subscription
+
+Users shall be able to subscribe to selected WWF environmental topics by providing an e-mail address.
+
+### FR-10 – E-Mail Notifications
+
+The system shall notify subscribed users by e-mail when relevant new developments are detected for their selected topics.
