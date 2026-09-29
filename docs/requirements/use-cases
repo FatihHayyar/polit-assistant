@@ -19,3 +19,31 @@ Eine Nutzerin oder ein Nutzer, die bzw. der eine E-Mail-Adresse hinterlegt und a
 ### OpenParlData
 
 Externes System, das die parlamentarischen Daten für den Polit-Assistant bereitstellt.
+---
+
+## 3. Anwendungsfälle
+
+### UC-01 – Parlamentarische Geschäfte suchen
+
+**Ziel:**  
+Nutzerinnen und Nutzer können gezielt nach parlamentarischen Geschäften suchen, um relevante politische Informationen schnell zu finden.
+
+**Akteur:**  
+Nutzerin / Nutzer
+
+**Vorbedingung:**  
+Parlamentarische Daten wurden aus OpenParlData importiert und stehen im Polit-Assistant zur Verfügung.
+
+**Hauptablauf:**
+
+1. Die Nutzerin oder der Nutzer öffnet die Suchfunktion.
+2. Ein Suchbegriff wird eingegeben.
+3. Das System durchsucht die verfügbaren parlamentarischen Geschäfte.
+4. Das System zeigt die gefundenen Geschäfte als Ergebnisliste an.
+5. Die Nutzerin oder der Nutzer kann ein Geschäft auswählen und die verfügbaren Informationen einsehen.
+
+**Ergebnis:**  
+Passende parlamentarische Geschäfte werden gefunden und für die Nutzerin oder den Nutzer dargestellt.
+
+**Zugehörige Anforderungen:**  
+FR-05 – Suche
