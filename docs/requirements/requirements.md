@@ -81,3 +81,26 @@ Possible applications include:
 ### FUT-03 – Additional Visualizations
 
 Additional dashboard and visualization functionality may be implemented depending on project progress and WWF feedback.
+---
+
+## 4. Non-Functional Requirements
+
+### NFR-01 – Maintainability
+
+The application shall have a modular structure that supports maintenance and further development.
+
+### NFR-02 – Extensibility
+
+The architecture shall support the addition of new functionality and external services without major changes to the core application.
+
+### NFR-03 – Traceability
+
+Relevant processing steps such as data import, classification and notification shall be technically traceable.
+
+### NFR-04 – Usability
+
+The user-facing functionality shall be simple and understandable enough to demonstrate and validate the MVP together with WWF.
+
+### NFR-05 – Documentation
+
+The architecture, setup, REST API and relevant technical decisions shall be documented sufficiently to support handover and further development.
