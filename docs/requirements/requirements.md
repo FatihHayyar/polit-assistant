@@ -59,3 +59,25 @@ The core functionality of the Polit-Assistant shall be accessible through a docu
 The core functionality shall be accessible through a simple and usable user interface.
 
 The concrete implementation of the user interface will be determined during MVP development.
+
+---
+
+## 3. Future / Optional Requirements
+
+### FUT-01 – Dialog-Oriented Queries
+
+The Polit-Assistant may provide a dialog-oriented interface for querying parliamentary information.
+
+### FUT-02 – AI Integration
+
+The architecture should allow the later integration of AI-based functionality.
+
+Possible applications include:
+
+- natural-language queries
+- summaries of parliamentary content
+- understandable explanations of political affairs
+
+### FUT-03 – Additional Visualizations
+
+Additional dashboard and visualization functionality may be implemented depending on project progress and WWF feedback.
