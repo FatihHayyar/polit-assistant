@@ -1,0 +1,21 @@
+# Anwendungsfälle – WWF Polit-Assistant
+
+## 1. Zweck
+
+Dieses Dokument beschreibt die zentralen Anwendungsfälle des WWF Polit-Assistants aus Sicht der Nutzerinnen und Nutzer.
+
+Die Anwendungsfälle konkretisieren die funktionalen Anforderungen des MVP und bilden eine Grundlage für die Implementierung und spätere Validierung der Lösung.
+
+## 2. Akteure
+
+### Nutzerin / Nutzer
+
+Eine Person, die den Polit-Assistant verwendet, um relevante parlamentarische Geschäfte zu suchen, zu filtern und zu beobachten.
+
+### Abonnentin / Abonnent
+
+Eine Nutzerin oder ein Nutzer, die bzw. der eine E-Mail-Adresse hinterlegt und ausgewählte WWF-Themen abonniert, um Benachrichtigungen über relevante neue Entwicklungen zu erhalten.
+
+### OpenParlData
+
+Externes System, das die parlamentarischen Daten für den Polit-Assistant bereitstellt.
