@@ -1,139 +1,145 @@
-# Requirements – WWF Polit-Assistant
+# Anforderungen – WWF Polit-Assistant
 
-## 1. Purpose
+## 1. Zweck
 
-The WWF Polit-Assistant supports WWF Switzerland in monitoring parliamentary developments related to selected environmental topics.
+Der WWF Polit-Assistant unterstützt WWF Schweiz beim Monitoring parlamentarischer Entwicklungen in ausgewählten umweltpolitischen Themenbereichen.
 
-The system processes parliamentary data from OpenParlData and makes relevant political affairs available for topic-based search, monitoring and notifications.
+Das System verarbeitet parlamentarische Daten aus OpenParlData und stellt relevante politische Geschäfte für die themenbasierte Suche, das Monitoring und Benachrichtigungen zur Verfügung.
 
-This document defines the functional and non-functional requirements of the MVP based on the agreed project scope.
----
-
-## 2. Functional Requirements
-
-### FR-01 – OpenParlData Integration
-
-The system shall retrieve relevant parliamentary data from the OpenParlData API.
-
-### FR-02 – Data Update
-
-The system shall regularly check OpenParlData for new or updated parliamentary data.
-
-### FR-03 – Data Storage
-
-The system shall store and link the parliamentary data required for monitoring.
-
-### FR-04 – Topic Classification
-
-The system shall automatically classify parliamentary affairs into defined WWF environmental topics using rule-based classification.
-
-Relevant affair data and, where appropriate, associated texts and documents shall be considered for classification.
-### FR-05 – Search
-
-Users shall be able to search parliamentary affairs.
-
-### FR-06 – Filtering
-
-Users shall be able to filter parliamentary affairs by relevant criteria, including WWF environmental topics.
-
-### FR-07 – New Affairs Monitoring
-
-The system shall detect new parliamentary affairs that match relevant WWF environmental topics.
-
-### FR-08 – Session Agenda Monitoring
-
-The system shall identify relevant parliamentary affairs appearing on parliamentary session agendas.
-### FR-09 – Topic Subscription
-
-Users shall be able to subscribe to selected WWF environmental topics by providing an e-mail address.
-
-### FR-10 – E-Mail Notifications
-
-The system shall notify subscribed users by e-mail when relevant new developments are detected for their selected topics.
-### FR-11 – REST API
-
-The core functionality of the Polit-Assistant shall be accessible through a documented REST API.
-
-### FR-12 – User Interface
-
-The core functionality shall be accessible through a simple and usable user interface.
-
-The concrete implementation of the user interface will be determined during MVP development.
+Dieses Dokument definiert die funktionalen und nicht-funktionalen Anforderungen an den MVP auf Basis des vereinbarten Projektumfangs.
 
 ---
 
-## 3. Future / Optional Requirements
+## 2. Funktionale Anforderungen
 
-### FUT-01 – Dialog-Oriented Queries
+### FR-01 – OpenParlData-Integration
 
-The Polit-Assistant may provide a dialog-oriented interface for querying parliamentary information.
+Das System soll relevante parlamentarische Daten über die OpenParlData API beziehen.
 
-### FUT-02 – AI Integration
+### FR-02 – Datenaktualisierung
 
-The architecture should allow the later integration of AI-based functionality.
+Das System soll OpenParlData regelmässig auf neue oder aktualisierte parlamentarische Daten prüfen.
 
-Possible applications include:
+### FR-03 – Datenspeicherung
 
-- natural-language queries
-- summaries of parliamentary content
-- understandable explanations of political affairs
+Das System soll die für das Monitoring benötigten parlamentarischen Daten strukturiert speichern und miteinander verknüpfen.
 
-### FUT-03 – Additional Visualizations
+### FR-04 – Themenklassifikation
 
-Additional dashboard and visualization functionality may be implemented depending on project progress and WWF feedback.
+Das System soll parlamentarische Geschäfte automatisch und regelbasiert den definierten WWF-Themenbereichen zuordnen.
+
+Für die Klassifikation sollen relevante Geschäftsdaten sowie, soweit geeignet, zugehörige Texte und Dokumente berücksichtigt werden.
+
+### FR-05 – Suche
+
+Nutzerinnen und Nutzer sollen parlamentarische Geschäfte durchsuchen können.
+
+### FR-06 – Filterung
+
+Nutzerinnen und Nutzer sollen parlamentarische Geschäfte nach relevanten Kriterien, insbesondere nach WWF-Themenbereichen, filtern können.
+
+### FR-07 – Monitoring neuer Geschäfte
+
+Das System soll neue parlamentarische Geschäfte erkennen, die relevanten WWF-Themenbereichen zugeordnet werden.
+
+### FR-08 – Monitoring von Sessionstraktanden
+
+Das System soll erkennen, wenn relevante parlamentarische Geschäfte auf den Traktanden parlamentarischer Sitzungen erscheinen.
+
+### FR-09 – Themenabonnement
+
+Nutzerinnen und Nutzer sollen durch Angabe einer E-Mail-Adresse ausgewählte WWF-Themenbereiche abonnieren können.
+
+### FR-10 – E-Mail-Benachrichtigungen
+
+Das System soll Abonnentinnen und Abonnenten per E-Mail über relevante neue Entwicklungen in den von ihnen ausgewählten Themenbereichen informieren.
+
+### FR-11 – REST-API
+
+Die Kernfunktionen des Polit-Assistants sollen über eine dokumentierte REST-API zugänglich sein.
+
+### FR-12 – Benutzerschnittstelle
+
+Die Kernfunktionen des Polit-Assistants sollen über eine einfache und verständliche Benutzerschnittstelle zugänglich sein.
+
+Die konkrete Ausgestaltung der Benutzerschnittstelle wird im Verlauf der MVP-Entwicklung festgelegt.
+
 ---
 
-## 4. Non-Functional Requirements
+## 3. Zukünftige / optionale Anforderungen
 
-### NFR-01 – Maintainability
+### FUT-01 – Dialogorientierte Abfragen
 
-The application shall have a modular structure that supports maintenance and further development.
+Der Polit-Assistant kann zukünftig um eine dialogorientierte Schnittstelle zur Abfrage parlamentarischer Informationen erweitert werden.
 
-### NFR-02 – Extensibility
+### FUT-02 – AI-Integration
 
-The architecture shall support the addition of new functionality and external services without major changes to the core application.
+Die Architektur soll eine spätere Integration AI-gestützter Funktionen ermöglichen.
 
-### NFR-03 – Traceability
+Mögliche Anwendungsbereiche sind:
 
-Relevant processing steps such as data import, classification and notification shall be technically traceable.
+- natürlichsprachliche Abfragen
+- automatische Zusammenfassungen parlamentarischer Inhalte
+- verständliche Erklärungen politischer Geschäfte
 
-### NFR-04 – Usability
+### FUT-03 – Zusätzliche Visualisierungen
 
-The user-facing functionality shall be simple and understandable enough to demonstrate and validate the MVP together with WWF.
+Abhängig vom Projektfortschritt und vom Feedback des WWF können zusätzliche Dashboard- und Visualisierungsfunktionen umgesetzt werden.
 
-### NFR-05 – Documentation
-
-The architecture, setup, REST API and relevant technical decisions shall be documented sufficiently to support handover and further development.
 ---
 
-## 5. Scope
+## 4. Nicht-funktionale Anforderungen
 
-### MVP Scope
+### NFR-01 – Wartbarkeit
 
-The initial MVP includes:
+Die Anwendung soll modular aufgebaut sein, sodass Wartung und Weiterentwicklung unterstützt werden.
 
-- OpenParlData integration and regular data updates
-- structured storage and linking of relevant parliamentary data
-- rule-based topic classification
-- search and filtering
-- monitoring of new relevant parliamentary affairs
-- monitoring of relevant session agendas
-- topic subscriptions
-- e-mail notifications
-- documented REST API
-- a simple and usable user interface
-- technical documentation
+### NFR-02 – Erweiterbarkeit
 
-### Outside the Initial MVP
+Die Architektur soll die Integration neuer Funktionen und externer Dienste ermöglichen, ohne dass dafür grundlegende Änderungen am Kernsystem erforderlich sind.
 
-The following functionality is not required for the initial MVP:
+### NFR-03 – Nachvollziehbarkeit
 
-- AI-based classification
-- LLM integration
-- AI-generated summaries and explanations
-- Microsoft 365 integration
-- SharePoint integration
-- Microsoft Teams integration
-- Microsoft Copilot integration
+Relevante Verarbeitungsschritte wie Datenimport, Klassifikation und Benachrichtigungen sollen technisch nachvollziehbar sein.
 
-These features may be evaluated as possible extensions based on project progress, technical feasibility and feedback from WWF.
+### NFR-04 – Benutzerfreundlichkeit
+
+Die benutzerseitigen Funktionen sollen einfach und verständlich gestaltet sein, sodass der MVP gemeinsam mit WWF demonstriert und validiert werden kann.
+
+### NFR-05 – Dokumentation
+
+Architektur, Installation und Betrieb, REST-API sowie relevante technische Entscheidungen sollen ausreichend dokumentiert werden, um die Übergabe und spätere Weiterentwicklung der Lösung zu unterstützen.
+
+---
+
+## 5. Projektumfang
+
+### Umfang des MVP
+
+Der initiale MVP umfasst:
+
+- Integration von OpenParlData und regelmässige Datenaktualisierung
+- strukturierte Speicherung und Verknüpfung relevanter parlamentarischer Daten
+- regelbasierte Themenklassifikation
+- Suche und Filterung
+- Monitoring neuer relevanter parlamentarischer Geschäfte
+- Monitoring relevanter Sessionstraktanden
+- Themenabonnements
+- E-Mail-Benachrichtigungen
+- dokumentierte REST-API
+- einfache und verständliche Benutzerschnittstelle
+- technische Dokumentation
+
+### Ausserhalb des initialen MVP
+
+Folgende Funktionen sind für den initialen MVP nicht verpflichtend:
+
+- AI-basierte Klassifikation
+- Integration eines Large Language Models (LLM)
+- AI-generierte Zusammenfassungen und Erklärungen
+- Microsoft-365-Integration
+- SharePoint-Integration
+- Microsoft-Teams-Integration
+- Microsoft-Copilot-Integration
+
+Diese Funktionen können abhängig vom Projektfortschritt, von der technischen Machbarkeit und vom Feedback des WWF als mögliche Erweiterungen evaluiert werden.
