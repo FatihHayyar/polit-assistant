@@ -104,3 +104,36 @@ The user-facing functionality shall be simple and understandable enough to demon
 ### NFR-05 – Documentation
 
 The architecture, setup, REST API and relevant technical decisions shall be documented sufficiently to support handover and further development.
+---
+
+## 5. Scope
+
+### MVP Scope
+
+The initial MVP includes:
+
+- OpenParlData integration and regular data updates
+- structured storage and linking of relevant parliamentary data
+- rule-based topic classification
+- search and filtering
+- monitoring of new relevant parliamentary affairs
+- monitoring of relevant session agendas
+- topic subscriptions
+- e-mail notifications
+- documented REST API
+- a simple and usable user interface
+- technical documentation
+
+### Outside the Initial MVP
+
+The following functionality is not required for the initial MVP:
+
+- AI-based classification
+- LLM integration
+- AI-generated summaries and explanations
+- Microsoft 365 integration
+- SharePoint integration
+- Microsoft Teams integration
+- Microsoft Copilot integration
+
+These features may be evaluated as possible extensions based on project progress, technical feasibility and feedback from WWF.
