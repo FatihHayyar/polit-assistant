@@ -50,3 +50,12 @@ Users shall be able to subscribe to selected WWF environmental topics by providi
 ### FR-10 – E-Mail Notifications
 
 The system shall notify subscribed users by e-mail when relevant new developments are detected for their selected topics.
+### FR-11 – REST API
+
+The core functionality of the Polit-Assistant shall be accessible through a documented REST API.
+
+### FR-12 – User Interface
+
+The core functionality shall be accessible through a simple and usable user interface.
+
+The concrete implementation of the user interface will be determined during MVP development.
