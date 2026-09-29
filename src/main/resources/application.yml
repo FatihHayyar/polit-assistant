@@ -35,69 +35,99 @@ classification:
   rules:
     ENERGY:
       - energie
+      - erneuerbare energie
       - strom
       - elektrizität
-      - electricity
-      - electric
-      - électricité
-      - solar
+      - solarenergie
       - photovoltaik
-      - wind
+      - windenergie
       - wasserkraft
+      - énergie
+      - électricité
+      - énergie solaire
+      - énergie renouvelable
 
     BIODIVERSITY:
       - biodiversität
       - artenvielfalt
+      - artenschutz
+      - naturschutz
       - schutzgebiet
       - ökosystem
-      - wald
-      - insekten
+      - waldschutz
+      - biodiversité
+      - protection des espèces
+      - protection de la nature
+      - écosystème
 
     WATER:
       - wasser
-      - eau
-      - acqua
       - gewässer
-      - fluss
-      - see
+      - gewässerschutz
+      - grundwasser
       - abwasser
       - renaturierung
+      - eau
+      - eaux
+      - protection des eaux
+      - eaux usées
 
     AGRICULTURE:
       - landwirtschaft
+      - agrarpolitik
       - pestizid
-      - boden
+      - pestizide
       - tierhaltung
       - dünger
+      - agriculture
+      - politique agricole
+      - pesticide
+      - pesticides
+      - engrais
 
     SPATIAL_PLANNING:
       - raumplanung
       - bauzone
       - verdichtung
-      - siedlung
+      - siedlungsentwicklung
       - landschaftsschutz
+      - aménagement du territoire
+      - zone à bâtir
+      - protection du paysage
 
     CLIMATE:
       - klima
+      - klimawandel
+      - klimaschutz
       - co2
       - treibhausgas
-      - emission
-      - klimaschutz
+      - treibhausgase
+      - klimaneutral
+      - climat
+      - changement climatique
+      - protection du climat
+      - gaz à effet de serre
 
     MOBILITY:
       - verkehr
       - mobilität
       - öffentlicher verkehr
+      - öffentlicher nahverkehr
       - öv
-      - bahn
       - veloverkehr
-      - velo
       - mobilité
-      - trasporto
+      - transports publics
+      - transport public
+      - mobilité douce
 
     WASTE:
       - abfall
+      - abfallwirtschaft
       - recycling
       - plastik
       - kunststoff
       - kreislaufwirtschaft
+      - déchets
+      - recyclage
+      - plastique
+      - économie circulaire

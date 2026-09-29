@@ -60,4 +60,14 @@ public class AffairJdbcRepository implements AffairStorePort {
                 affair.urlExternalDe()
         );
     }
+    @Override
+    public boolean existsById(Long affairId) {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM affairs WHERE id = ?",
+                Integer.class,
+                affairId
+        );
+
+        return count != null && count > 0;
+    }
 }

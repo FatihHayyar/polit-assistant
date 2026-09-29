@@ -114,50 +114,76 @@ public class AffairImportService {
             int limit,
             java.time.LocalDateTime lastSync
     ) {
-        var response = openParlDataClient.fetchLatestAffairs(limit);
-
-        if (response == null || response.data() == null) {
-            return new ImportOrchestratorService.ImportResult(
-                    0,
-                    0,
-                    new java.util.ArrayList<>(),
-                    null
-            );
-        }
-
+        int currentOffset = 0;
         int affairsImported = 0;
         int docsImported = 0;
-        var importedAffairIds = new java.util.ArrayList<Long>();
+
+        var importedAffairIds = new ArrayList<Long>();
+
         java.time.LocalDateTime maxUpdatedAt = null;
+        boolean reachedLastSync = false;
 
-        for (var dto : response.data()) {
-            if (dto.updated_at() == null || dto.updated_at().isBlank()) {
-                continue;
-            }
+        while (true) {
 
-            var updatedAt = java.time.LocalDateTime.parse(dto.updated_at());
+            var response = openParlDataClient.fetchAffairs(
+                    currentOffset,
+                    limit,
+                    "-updated_at"
+            );
 
-            if (lastSync != null && !updatedAt.isAfter(lastSync)) {
+            if (response == null
+                    || response.data() == null
+                    || response.data().isEmpty()) {
                 break;
             }
 
-            if (maxUpdatedAt == null || updatedAt.isAfter(maxUpdatedAt)) {
-                maxUpdatedAt = updatedAt;
-            }
+            for (var dto : response.data()) {
 
-            rawRepository.upsert(dto.id(), dto);
-            affairStorePort.upsert(mapper.toDomain(dto));
-            affairsImported++;
-            importedAffairIds.add(dto.id());
+                if (dto.updated_at() == null || dto.updated_at().isBlank()) {
+                    continue;
+                }
 
-            var docsResponse = openParlDataClient.fetchDocsForAffair(dto.id());
+                var updatedAt =
+                        java.time.LocalDateTime.parse(dto.updated_at());
 
-            if (docsResponse != null && docsResponse.data() != null) {
-                for (var doc : docsResponse.data()) {
-                    docRepository.upsert(doc);
-                    docsImported++;
+                // Results are sorted by -updated_at.
+                // Once we reach the previous checkpoint,
+                // all following records are older and can be skipped.
+                if (lastSync != null && !updatedAt.isAfter(lastSync)) {
+                    reachedLastSync = true;
+                    break;
+                }
+
+                if (maxUpdatedAt == null || updatedAt.isAfter(maxUpdatedAt)) {
+                    maxUpdatedAt = updatedAt;
+                }
+
+                rawRepository.upsert(dto.id(), dto);
+                affairStorePort.upsert(mapper.toDomain(dto));
+
+                affairsImported++;
+                importedAffairIds.add(dto.id());
+
+                var docsResponse =
+                        openParlDataClient.fetchDocsForAffair(dto.id());
+
+                if (docsResponse != null && docsResponse.data() != null) {
+                    for (var doc : docsResponse.data()) {
+                        docRepository.upsert(doc);
+                        docsImported++;
+                    }
                 }
             }
+
+            if (reachedLastSync) {
+                break;
+            }
+
+            if (response.meta() == null || !response.meta().has_more()) {
+                break;
+            }
+
+            currentOffset += limit;
         }
 
         return new ImportOrchestratorService.ImportResult(
@@ -166,5 +192,27 @@ public class AffairImportService {
                 importedAffairIds,
                 maxUpdatedAt
         );
+    }
+    @Transactional
+    public Long importAffairWithDocsById(Long affairId) {
+
+        var dto = openParlDataClient.fetchAffairById(affairId);
+
+        if (dto == null) {
+            return null;
+        }
+
+        rawRepository.upsert(dto.id(), dto);
+        affairStorePort.upsert(mapper.toDomain(dto));
+
+        var docsResponse = openParlDataClient.fetchDocsForAffair(dto.id());
+
+        if (docsResponse != null && docsResponse.data() != null) {
+            for (var doc : docsResponse.data()) {
+                docRepository.upsert(doc);
+            }
+        }
+
+        return dto.id();
     }
 }

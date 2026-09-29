@@ -25,7 +25,7 @@ public class OpenParlDataImportScheduler {
 
     @Scheduled(cron = "0 30 6 * * *")
     public void runMorningImport() {
-        var jobId = importJobService.start("OPENPARLDATA_AFFAIRS_FULL_IMPORT");
+        var jobId = importJobService.start("OPENPARLDATA_AFFAIRS_INCREMENTAL_IMPORT");
 
         try {
             var result = orchestratorService.runIncrementalImport(50);
@@ -39,6 +39,29 @@ public class OpenParlDataImportScheduler {
 
         } catch (Exception e) {
             importJobService.failed(jobId, e.getMessage());
+            log.error("Affair import failed", e);
+        }
+    }
+    @Scheduled(cron = "0 35 6 * * *")
+    public void runMorningMeetingAgendaImport() {
+
+        var jobId = importJobService.start(
+                "OPENPARLDATA_MEETINGS_INCREMENTAL_IMPORT"
+        );
+
+        try {
+            var result = orchestratorService.runMeetingAgendaImport(50);
+
+            importJobService.success(
+                    jobId,
+                    result.importedMeetings(),
+                    0,
+                    0
+            );
+
+        } catch (Exception e) {
+            importJobService.failed(jobId, e.getMessage());
+            log.error("Meeting/Agenda import failed", e);
         }
     }
 }

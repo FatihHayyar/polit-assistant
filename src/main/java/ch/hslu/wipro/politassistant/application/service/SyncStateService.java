@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Service
 public class SyncStateService {
 
-    public static final String OPENPARLDATA = "OPENPARLDATA";
-
+    public static final String OPENPARLDATA_AFFAIRS = "OPENPARLDATA_AFFAIRS";
+    public static final String OPENPARLDATA_MEETINGS = "OPENPARLDATA_MEETINGS";
     private final SyncStateJpaRepository repository;
 
     public SyncStateService(SyncStateJpaRepository repository) {
@@ -19,16 +19,19 @@ public class SyncStateService {
     }
 
     @Transactional(readOnly = true)
-    public LocalDateTime getLastSuccessfulSync() {
-        return repository.findById(OPENPARLDATA)
+    public LocalDateTime getLastSuccessfulSync(String source) {
+        return repository.findById(source)
                 .map(SyncStateEntity::getLastSuccessfulSync)
                 .orElse(null);
     }
 
     @Transactional
-    public void updateLastSuccessfulSync(LocalDateTime syncTime) {
-        SyncStateEntity state = repository.findById(OPENPARLDATA)
-                .orElseGet(() -> new SyncStateEntity(OPENPARLDATA));
+    public void updateLastSuccessfulSync(
+            String source,
+            LocalDateTime syncTime
+    ) {
+        SyncStateEntity state = repository.findById(source)
+                .orElseGet(() -> new SyncStateEntity(source));
 
         state.updateLastSuccessfulSync(syncTime);
         repository.save(state);

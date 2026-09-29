@@ -12,15 +12,18 @@ public class ImportOrchestratorService {
     private final RuleBasedClassificationService classificationService;
     private final AlertService alertService;
     private final SyncStateService syncStateService;
+    private final MeetingAgendaImportService meetingAgendaImportService;
+
     public ImportOrchestratorService(
             AffairImportService affairImportService,
             RuleBasedClassificationService classificationService,
-            AlertService alertService, SyncStateService syncStateService
+            AlertService alertService, SyncStateService syncStateService, MeetingAgendaImportService meetingAgendaImportService
     ) {
         this.affairImportService = affairImportService;
         this.classificationService = classificationService;
         this.alertService = alertService;
         this.syncStateService = syncStateService;
+        this.meetingAgendaImportService = meetingAgendaImportService;
     }
 
     @Transactional
@@ -30,7 +33,10 @@ public class ImportOrchestratorService {
         int classified = classificationService.classifyAll(result.importedAffairIds());
         int alertsCreated = alertService.createAlertsForImportedAffairs(result.importedAffairIds());
         if (result.maxUpdatedAt() != null) {
-            syncStateService.updateLastSuccessfulSync(result.maxUpdatedAt());
+            syncStateService.updateLastSuccessfulSync(
+                    SyncStateService.OPENPARLDATA_AFFAIRS,
+                    result.maxUpdatedAt()
+            );
         }
         return new FullImportResult(
                 result.affairsImported(),
@@ -41,7 +47,9 @@ public class ImportOrchestratorService {
     }
     @Transactional
     public FullImportResult runIncrementalImport(int limit) {
-        var lastSync = syncStateService.getLastSuccessfulSync();
+        var lastSync = syncStateService.getLastSuccessfulSync(
+                SyncStateService.OPENPARLDATA_AFFAIRS
+        );
 
         var result = affairImportService.importLatestAffairsOnly(limit, lastSync);
 
@@ -49,7 +57,10 @@ public class ImportOrchestratorService {
         int alertsCreated = alertService.createAlertsForImportedAffairs(result.importedAffairIds());
 
         if (result.maxUpdatedAt() != null) {
-            syncStateService.updateLastSuccessfulSync(result.maxUpdatedAt());
+            syncStateService.updateLastSuccessfulSync(
+                    SyncStateService.OPENPARLDATA_AFFAIRS,
+                    result.maxUpdatedAt()
+            );
         }
 
         return new FullImportResult(
@@ -58,6 +69,28 @@ public class ImportOrchestratorService {
                 classified,
                 alertsCreated
         );
+    }
+    @Transactional
+    public MeetingAgendaImportService.ImportResult runMeetingAgendaImport(int limit) {
+
+        var lastSync = syncStateService.getLastSuccessfulSync(
+                SyncStateService.OPENPARLDATA_MEETINGS
+        );
+
+        var result = meetingAgendaImportService.importMeetingsWithAgendas(
+                0,
+                limit,
+                lastSync
+        );
+
+        if (result.maxUpdatedAt() != null) {
+            syncStateService.updateLastSuccessfulSync(
+                    SyncStateService.OPENPARLDATA_MEETINGS,
+                    result.maxUpdatedAt()
+            );
+        }
+
+        return result;
     }
     public record FullImportResult(
             int affairsImported,
