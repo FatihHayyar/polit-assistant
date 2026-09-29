@@ -43,11 +43,35 @@ Der grundlegende Datenfluss ist:
 
 OpenParlData → Datenimport und Aktualisierung → Persistenz → Themenklassifikation → Suche und Monitoring → REST-API → Benutzerschnittstelle / Benachrichtigungen
 
-## 5. Zentrale Komponenten
+## 5. OpenParlData-Integration und relevantes Datenmodell
+
+OpenParlData dient als zentrale externe Datenquelle des Polit-Assistants. Die Plattform stellt strukturierte parlamentarische Daten über eine REST-API zur Verfügung.
+
+Für den MVP sind insbesondere folgende Datenbereiche relevant:
+
+- **Affairs** – parlamentarische Geschäfte als zentrale fachliche Entität
+- **Texts** – zugehörige parlamentarische Texte, die unter anderem für die Themenklassifikation berücksichtigt werden können
+- **Docs** – zugehörige Dokumente als zusätzliche Informationsquelle
+- **Meetings** – parlamentarische Sitzungen
+- **Agendas** – Traktanden von Sitzungen und deren Verknüpfung mit parlamentarischen Geschäften
+- **Events** – Ereignisse im Verlauf eines parlamentarischen Geschäfts
+- **Bodies** – parlamentarische Organe und Gremien
+
+Für das Monitoring bildet insbesondere die Beziehung zwischen Sitzungen, Traktanden und parlamentarischen Geschäften eine wichtige Grundlage:
+
+`Meetings → Agendas → Affairs`
+
+Für die inhaltliche Verarbeitung und Themenklassifikation können zusätzliche Informationen eines Geschäfts berücksichtigt werden:
+
+`Affairs → Texts / Docs`
+
+Der konkrete Umfang der importierten Daten wird während der MVP-Entwicklung anhand der benötigten Anwendungsfälle überprüft und bei Bedarf angepasst.
+
+## 6. Zentrale Komponenten
 
 Die detaillierte Beschreibung der einzelnen Komponenten wird im Verlauf der MVP-Entwicklung ergänzt und an den tatsächlich implementierten Stand angepasst.
 
-## 6. Weiterentwicklung der Architektur
+## 7. Weiterentwicklung der Architektur
 
 Die Architektur wird im Rahmen des iterativen Vorgehens überprüft und bei Bedarf auf Basis der technischen Erkenntnisse und des Feedbacks von WWF angepasst.
 
