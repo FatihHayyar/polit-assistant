@@ -1,4 +1,19 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 15000
+          timeout: 15000
+          writetimeout: 15000
   application:
     name: polit-assistant
 
@@ -15,6 +30,16 @@ spring:
   flyway:
     enabled: true
 
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+
+  mail:
+    from: ${MAIL_USERNAME}
+
+  ollama:
+    base-url: http://localhost:11434
+    model: qwen2.5:3b
+
 management:
   endpoints:
     web:
@@ -27,13 +52,10 @@ management:
 openparldata:
   base-url: https://api.openparldata.ch
 
-notification:
-  teams:
-    webhook-url:
 
 classification:
   rules:
-    ENERGY:
+    ENERGIE:
       - energie
       - erneuerbare energie
       - strom
@@ -47,7 +69,7 @@ classification:
       - énergie solaire
       - énergie renouvelable
 
-    BIODIVERSITY:
+    BIODIVERSITAET:
       - biodiversität
       - artenvielfalt
       - artenschutz
@@ -60,7 +82,7 @@ classification:
       - protection de la nature
       - écosystème
 
-    WATER:
+    WASSER:
       - wasser
       - gewässer
       - gewässerschutz
@@ -72,7 +94,7 @@ classification:
       - protection des eaux
       - eaux usées
 
-    AGRICULTURE:
+    LANDWIRTSCHAFT:
       - landwirtschaft
       - agrarpolitik
       - pestizid
@@ -85,7 +107,7 @@ classification:
       - pesticides
       - engrais
 
-    SPATIAL_PLANNING:
+    RAUMPLANUNG:
       - raumplanung
       - bauzone
       - verdichtung
@@ -95,7 +117,7 @@ classification:
       - zone à bâtir
       - protection du paysage
 
-    CLIMATE:
+    KLIMA:
       - klima
       - klimawandel
       - klimaschutz
@@ -108,7 +130,7 @@ classification:
       - protection du climat
       - gaz à effet de serre
 
-    MOBILITY:
+    MOBILITAET:
       - verkehr
       - mobilität
       - öffentlicher verkehr
@@ -120,7 +142,7 @@ classification:
       - transport public
       - mobilité douce
 
-    WASTE:
+    ABFALL:
       - abfall
       - abfallwirtschaft
       - recycling

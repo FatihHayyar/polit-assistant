@@ -12,6 +12,8 @@ import java.util.List;
 @Service
 public class AlertService {
 
+    private static final String EMAIL_CHANNEL = "EMAIL";
+
     private final AlertJpaRepository alertRepository;
     private final AffairReadJpaRepository affairRepository;
     private final NotificationService notificationService;
@@ -19,7 +21,9 @@ public class AlertService {
 
     public AlertService(
             AlertJpaRepository alertRepository,
-            AffairReadJpaRepository affairRepository, NotificationService notificationService, UserPreferenceJpaRepository userPreferenceRepository
+            AffairReadJpaRepository affairRepository,
+            NotificationService notificationService,
+            UserPreferenceJpaRepository userPreferenceRepository
     ) {
         this.alertRepository = alertRepository;
         this.affairRepository = affairRepository;
@@ -35,50 +39,65 @@ public class AlertService {
             var results = affairRepository.findSummaryById(affairId);
 
             for (var affair : results) {
-                if (affair.topic() == null || affair.topic().equals("OTHER")) {
+                if (affair.topic() == null || affair.topic().equals("SONSTIGES")) {
                     continue;
                 }
 
-                var preferences = userPreferenceRepository.findByTopicAndActiveTrue(affair.topic());
+                var preferences =
+                        userPreferenceRepository.findByTopicAndActiveTrue(
+                                affair.topic()
+                        );
 
                 for (var preference : preferences) {
-                    boolean exists = alertRepository.existsByAffairIdAndTopicAndChannelAndRecipientEmail(
-                            affair.id(),
-                            affair.topic(),
-                            preference.getChannel(),
-                            preference.getEmail()
-                    );
+
+                    boolean exists =
+                            alertRepository
+                                    .existsByAffairIdAndTopicAndChannelAndRecipientEmail(
+                                            affair.id(),
+                                            affair.topic(),
+                                            EMAIL_CHANNEL,
+                                            preference.getEmail()
+                                    );
 
                     if (exists) {
                         continue;
                     }
 
-                    String title = "New political affair: " + affair.topic();
+                    String topicDisplayName =
+                            toTopicDisplayName(affair.topic());
+
+                    String title =
+                            "Neues parlamentarisches Geschäft: "
+                                    + topicDisplayName;
 
                     String message = """
-                        Topic: %s
-                        Title: %s
-                        Type: %s
-                        State: %s
-                        Link: %s
-                        Recipient: %s
-                        """.formatted(
-                            affair.topic(),
+                            WWF Polit-Assistant
+
+                            Ein neues relevantes parlamentarisches Geschäft wurde erkannt.
+
+                            Thema: %s
+                            Titel: %s
+                            Typ: %s
+                            Status: %s
+                            Link: %s
+                            """.formatted(
+                            topicDisplayName,
                             affair.title(),
                             affair.type(),
                             affair.state(),
-                            affair.urlExternal(),
-                            preference.getEmail()
+                            affair.urlExternal()
                     );
 
-                    alertRepository.save(AlertEntity.pending(
-                            affair.id(),
-                            affair.topic(),
-                            preference.getChannel(),
-                            preference.getEmail(),
-                            title,
-                            message
-                    ));
+                    alertRepository.save(
+                            AlertEntity.pending(
+                                    affair.id(),
+                                    affair.topic(),
+                                    EMAIL_CHANNEL,
+                                    preference.getEmail(),
+                                    title,
+                                    message
+                            )
+                    );
 
                     created++;
                 }
@@ -87,12 +106,14 @@ public class AlertService {
 
         return created;
     }
+
     @Transactional
     public int sendPendingAlerts() {
-        var alerts = alertRepository.findByStatusInAndRetryCountLessThan(
-                List.of("PENDING", "FAILED"),
-                3
-        );
+        var alerts =
+                alertRepository.findByStatusInAndRetryCountLessThan(
+                        List.of("PENDING", "FAILED"),
+                        3
+                );
 
         int sent = 0;
 
@@ -107,5 +128,15 @@ public class AlertService {
         }
 
         return sent;
+    }
+
+    private String toTopicDisplayName(String databaseTopic) {
+        try {
+            return ch.hslu.wipro.politassistant.domain.classification.Topic
+                    .valueOf(databaseTopic)
+                    .getDisplayName();
+        } catch (IllegalArgumentException e) {
+            return databaseTopic;
+        }
     }
 }

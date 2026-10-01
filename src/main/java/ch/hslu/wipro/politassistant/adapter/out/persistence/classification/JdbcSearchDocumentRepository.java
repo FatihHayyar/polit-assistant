@@ -5,6 +5,8 @@ import ch.hslu.wipro.politassistant.domain.classification.AffairSearchDocument;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class JdbcSearchDocumentRepository implements SearchDocumentPort {
 
@@ -16,24 +18,55 @@ public class JdbcSearchDocumentRepository implements SearchDocumentPort {
 
     @Override
     public AffairSearchDocument load(Long affairId) {
-        return jdbcTemplate.queryForObject("""
+
+        AffairData affair = jdbcTemplate.queryForObject(
+                """
                 SELECT
-                    a.id,
-                    a.title_de,
-                    a.title_long_de,
-                    COALESCE(STRING_AGG(d.text_content, ' '), '')
-                FROM affairs a
-                LEFT JOIN affair_docs d ON d.affair_id = a.id
-                WHERE a.id = ?
-                GROUP BY a.id, a.title_de, a.title_long_de
+                    id,
+                    title_de,
+                    title_long_de
+                FROM affairs
+                WHERE id = ?
                 """,
-                (rs, rowNum) -> new AffairSearchDocument(
-                        rs.getLong(1),
-                        rs.getString(2),
-                        rs.getString(3),
-                        rs.getString(4)
+                (rs, rowNum) -> new AffairData(
+                        rs.getLong("id"),
+                        rs.getString("title_de"),
+                        rs.getString("title_long_de")
                 ),
                 affairId
         );
+
+        if (affair == null) {
+            throw new IllegalArgumentException(
+                    "Parlamentarisches Geschäft nicht gefunden: " + affairId
+            );
+        }
+
+        List<String> documentContents = jdbcTemplate.query(
+                """
+                SELECT text_content
+                FROM affair_docs
+                WHERE affair_id = ?
+                  AND text_content IS NOT NULL
+                  AND text_content <> ''
+                ORDER BY id
+                """,
+                (rs, rowNum) -> rs.getString("text_content"),
+                affairId
+        );
+
+        return new AffairSearchDocument(
+                affair.id(),
+                affair.title(),
+                affair.titleLong(),
+                documentContents
+        );
+    }
+
+    private record AffairData(
+            Long id,
+            String title,
+            String titleLong
+    ) {
     }
 }

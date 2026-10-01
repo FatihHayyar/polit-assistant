@@ -7,13 +7,32 @@ import ch.hslu.wipro.politassistant.domain.classification.Topic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class RuleBasedClassificationService {
 
-    private static final String CLASSIFIER_NAME = "RULE_ENGINE_V2";
+    private static final String CLASSIFIER_NAME = "RULE_ENGINE_V3";
+
+    private static final int DOCUMENT_WINDOW_SIZE = 800;
+    private static final int MIN_DOCUMENT_EVIDENCE = 3;
+
+    /*
+     * Very short keywords are prone to accidental substring matches.
+     *
+     * Examples:
+     *   "eau" in "nouveau" must NOT match.
+     *   "öv" inside another word must NOT match.
+     *
+     * Longer keywords still use substring matching so that German
+     * compounds such as "Hochwasserschutz" or "Fliessgewässern"
+     * continue to work.
+     */
+    private static final int WHOLE_WORD_MAX_LENGTH = 4;
 
     private final SearchDocumentPort searchDocumentPort;
     private final ClassificationStorePort classificationStorePort;
@@ -36,7 +55,6 @@ public class RuleBasedClassificationService {
 
         String title = normalize(document.title());
         String titleLong = normalize(document.titleLong());
-        String documentContent = normalize(document.documentContent());
 
         classificationStorePort.deleteByAffairId(affairId);
 
@@ -45,70 +63,83 @@ public class RuleBasedClassificationService {
         for (var entry : properties.getRules().entrySet()) {
 
             Topic topic = entry.getKey();
+            List<String> keywords = normalizeKeywords(entry.getValue());
 
             List<String> titleMatches =
-                    findMatches(title, entry.getValue());
+                    findKeywordMatches(title, keywords);
 
             List<String> titleLongMatches =
-                    findMatches(titleLong, entry.getValue());
+                    findKeywordMatches(titleLong, keywords);
 
-            List<String> documentMatches =
-                    findMatches(documentContent, entry.getValue());
+            DocumentEvidence documentEvidence =
+                    findBestDocumentEvidence(
+                            document.documentContents(),
+                            keywords
+                    );
 
             boolean hasTitleMatch = !titleMatches.isEmpty();
             boolean hasTitleLongMatch = !titleLongMatches.isEmpty();
-            boolean hasEnoughDocumentMatches = documentMatches.size() >= 3;
+
+            boolean hasDocumentEvidence =
+                    documentEvidence != null
+                            && documentEvidence.keywords().size()
+                            >= MIN_DOCUMENT_EVIDENCE;
 
             if (!hasTitleMatch
                     && !hasTitleLongMatch
-                    && !hasEnoughDocumentMatches) {
+                    && !hasDocumentEvidence) {
                 continue;
             }
 
-            /*
-             * Title is the strongest signal.
-             *
-             * Title match:
-             *      base confidence 0.90
-             *
-             * Long title match:
-             *      base confidence 0.80
-             *
-             * Document-only match:
-             *      base confidence 0.50
-             */
             double confidence;
 
-            if (!titleMatches.isEmpty()) {
+            if (hasTitleMatch) {
+
                 confidence = Math.min(
                         1.0,
                         0.90 + (titleMatches.size() - 1) * 0.05
                 );
-            } else if (!titleLongMatches.isEmpty()) {
+
+            } else if (hasTitleLongMatch) {
+
                 confidence = Math.min(
                         0.90,
                         0.80 + (titleLongMatches.size() - 1) * 0.05
                 );
+
             } else {
+
                 confidence = Math.min(
                         0.80,
-                        0.50 + documentMatches.size() * 0.10
+                        0.50
+                                + documentEvidence.keywords().size() * 0.10
                 );
             }
 
             List<String> allMatches = new ArrayList<>();
 
             titleMatches.forEach(
-                    keyword -> allMatches.add("TITLE:" + keyword)
+                    keyword ->
+                            allMatches.add("TITLE:" + keyword)
             );
 
             titleLongMatches.forEach(
-                    keyword -> allMatches.add("TITLE_LONG:" + keyword)
+                    keyword ->
+                            allMatches.add("TITLE_LONG:" + keyword)
             );
 
-            documentMatches.forEach(
-                    keyword -> allMatches.add("DOCUMENT:" + keyword)
-            );
+            if (hasDocumentEvidence) {
+
+                documentEvidence.keywords().forEach(
+                        keyword ->
+                                allMatches.add(
+                                        "DOCUMENT["
+                                                + documentEvidence.documentNumber()
+                                                + "]:"
+                                                + keyword
+                                )
+                );
+            }
 
             classificationStorePort.save(
                     affairId,
@@ -131,7 +162,7 @@ public class RuleBasedClassificationService {
 
             classificationStorePort.save(
                     affairId,
-                    Topic.OTHER,
+                    Topic.SONSTIGES,
                     0.1,
                     CLASSIFIER_NAME,
                     List.of()
@@ -139,7 +170,7 @@ public class RuleBasedClassificationService {
 
             classifications.add(
                     new TopicClassification(
-                            Topic.OTHER,
+                            Topic.SONSTIGES,
                             0.1,
                             List.of()
                     )
@@ -152,29 +183,300 @@ public class RuleBasedClassificationService {
         );
     }
 
-    private List<String> findMatches(
+    private DocumentEvidence findBestDocumentEvidence(
+            List<String> documentContents,
+            List<String> keywords
+    ) {
+
+        DocumentEvidence bestEvidence = null;
+
+        for (int documentIndex = 0;
+             documentIndex < documentContents.size();
+             documentIndex++) {
+
+            String content =
+                    normalize(documentContents.get(documentIndex));
+
+            if (content.isBlank()) {
+                continue;
+            }
+
+            List<Occurrence> occurrences =
+                    findOccurrences(content, keywords);
+
+            if (occurrences.size() < MIN_DOCUMENT_EVIDENCE) {
+                continue;
+            }
+
+            DocumentEvidence evidence =
+                    findBestWindow(
+                            occurrences,
+                            documentIndex + 1
+                    );
+
+            if (evidence == null) {
+                continue;
+            }
+
+            if (bestEvidence == null
+                    || evidence.keywords().size()
+                    > bestEvidence.keywords().size()) {
+
+                bestEvidence = evidence;
+            }
+        }
+
+        return bestEvidence;
+    }
+
+    private DocumentEvidence findBestWindow(
+            List<Occurrence> occurrences,
+            int documentNumber
+    ) {
+
+        DocumentEvidence best = null;
+
+        for (int start = 0; start < occurrences.size(); start++) {
+
+            int windowStart = occurrences.get(start).start();
+            int windowEnd = windowStart + DOCUMENT_WINDOW_SIZE;
+
+            List<Occurrence> windowOccurrences =
+                    occurrences.stream()
+                            .filter(occurrence ->
+                                    occurrence.start() >= windowStart
+                                            && occurrence.start() <= windowEnd
+                            )
+                            .toList();
+
+            List<Occurrence> independentOccurrences =
+                    removeOverlappingOccurrences(windowOccurrences);
+
+            List<String> distinctKeywords =
+                    independentOccurrences.stream()
+                            .map(Occurrence::keyword)
+                            .distinct()
+                            .toList();
+
+            if (distinctKeywords.size() < MIN_DOCUMENT_EVIDENCE) {
+                continue;
+            }
+
+            DocumentEvidence candidate =
+                    new DocumentEvidence(
+                            documentNumber,
+                            distinctKeywords
+                    );
+
+            if (best == null
+                    || candidate.keywords().size()
+                    > best.keywords().size()) {
+
+                best = candidate;
+            }
+        }
+
+        return best;
+    }
+
+    private List<Occurrence> findOccurrences(
             String content,
             List<String> keywords
     ) {
+
+        List<Occurrence> occurrences = new ArrayList<>();
+
+        /*
+         * Longer keywords first so that expressions such as
+         * "eaux usées" are preferred over contained shorter terms.
+         */
+        List<String> sortedKeywords =
+                keywords.stream()
+                        .sorted(
+                                Comparator.comparingInt(String::length)
+                                        .reversed()
+                        )
+                        .toList();
+
+        for (String keyword : sortedKeywords) {
+
+            int fromIndex = 0;
+
+            while (fromIndex < content.length()) {
+
+                int index = content.indexOf(keyword, fromIndex);
+
+                if (index < 0) {
+                    break;
+                }
+
+                int end = index + keyword.length();
+
+                if (isValidOccurrence(
+                        content,
+                        keyword,
+                        index,
+                        end
+                )) {
+
+                    occurrences.add(
+                            new Occurrence(
+                                    keyword,
+                                    index,
+                                    end
+                            )
+                    );
+                }
+
+                fromIndex = index + 1;
+            }
+        }
+
+        return occurrences.stream()
+                .sorted(Comparator.comparingInt(Occurrence::start))
+                .toList();
+    }
+
+    private List<Occurrence> removeOverlappingOccurrences(
+            List<Occurrence> occurrences
+    ) {
+
+        List<Occurrence> sorted =
+                occurrences.stream()
+                        .sorted(
+                                Comparator
+                                        .comparingInt(Occurrence::start)
+                                        .thenComparing(
+                                                Comparator.comparingInt(
+                                                        Occurrence::length
+                                                ).reversed()
+                                        )
+                        )
+                        .toList();
+
+        List<Occurrence> accepted = new ArrayList<>();
+
+        for (Occurrence candidate : sorted) {
+
+            boolean overlaps = accepted.stream()
+                    .anyMatch(existing ->
+                            candidate.start() < existing.end()
+                                    && candidate.end() > existing.start()
+                    );
+
+            if (!overlaps) {
+                accepted.add(candidate);
+            }
+        }
+
+        return accepted;
+    }
+
+    private List<String> findKeywordMatches(
+            String content,
+            List<String> keywords
+    ) {
+
         if (content.isBlank()) {
             return List.of();
         }
 
         return keywords.stream()
-                .map(keyword -> keyword.toLowerCase(Locale.ROOT))
-                .filter(keyword -> matchesKeyword(content, keyword))
+                .filter(keyword ->
+                        containsValidKeyword(content, keyword)
+                )
                 .distinct()
                 .toList();
     }
 
-    private boolean matchesKeyword(
+    private boolean containsValidKeyword(
             String content,
             String keyword
     ) {
-        return content.contains(keyword);
+
+        int fromIndex = 0;
+
+        while (fromIndex < content.length()) {
+
+            int index = content.indexOf(keyword, fromIndex);
+
+            if (index < 0) {
+                return false;
+            }
+
+            int end = index + keyword.length();
+
+            if (isValidOccurrence(
+                    content,
+                    keyword,
+                    index,
+                    end
+            )) {
+                return true;
+            }
+
+            fromIndex = index + 1;
+        }
+
+        return false;
+    }
+
+    private boolean isValidOccurrence(
+            String content,
+            String keyword,
+            int start,
+            int end
+    ) {
+
+        /*
+         * Longer keywords intentionally support substring matching.
+         * This is necessary for German compound words:
+         *
+         * wasser   -> Hochwasserschutz
+         * gewässer -> Fliessgewässern
+         */
+        if (keyword.length() > WHOLE_WORD_MAX_LENGTH) {
+            return true;
+        }
+
+        /*
+         * Short keywords must be independent words.
+         *
+         * eau -> "ressource en eau"  : valid
+         * eau -> "nouveau"           : invalid
+         */
+        boolean validStart =
+                start == 0
+                        || !Character.isLetterOrDigit(
+                        content.charAt(start - 1)
+                );
+
+        boolean validEnd =
+                end >= content.length()
+                        || !Character.isLetterOrDigit(
+                        content.charAt(end)
+                );
+
+        return validStart && validEnd;
+    }
+
+    private List<String> normalizeKeywords(
+            List<String> keywords
+    ) {
+
+        return keywords.stream()
+                .filter(keyword ->
+                        keyword != null && !keyword.isBlank()
+                )
+                .map(keyword ->
+                        keyword.toLowerCase(Locale.ROOT).trim()
+                )
+                .distinct()
+                .toList();
     }
 
     private String normalize(String value) {
+
         return Optional.ofNullable(value)
                 .orElse("")
                 .toLowerCase(Locale.ROOT);
@@ -196,11 +498,30 @@ public class RuleBasedClassificationService {
     public record ClassificationResult(
             Long affairId,
             List<TopicClassification> classifications
-    ) {}
+    ) {
+    }
 
     public record TopicClassification(
             Topic topic,
             double confidence,
             List<String> matchedKeywords
-    ) {}
+    ) {
+    }
+
+    private record Occurrence(
+            String keyword,
+            int start,
+            int end
+    ) {
+
+        int length() {
+            return end - start;
+        }
+    }
+
+    private record DocumentEvidence(
+            int documentNumber,
+            List<String> keywords
+    ) {
+    }
 }

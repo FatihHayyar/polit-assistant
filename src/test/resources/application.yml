@@ -1,0 +1,24 @@
+spring:
+  mail:
+    host: localhost
+    port: 1025
+    username: test@example.com
+    password: test-password
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+openparldata:
+  base-url: https://api.openparldata.ch
+
+app:
+  base-url: http://localhost:8080
+  mail:
+    from: test@example.com
+
+  ollama:
+    base-url: http://localhost:11434
+    model: qwen2.5:3b

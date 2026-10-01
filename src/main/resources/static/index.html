@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>WWF Polit-Assistant</title>
+
+    <link
+            rel="stylesheet"
+            href="/css/app.css">
+</head>
+
+<body>
+
+<header class="app-header">
+
+    <div class="header-content">
+
+        <div class="header-main">
+
+            <div>
+                <h1>WWF Polit-Assistant</h1>
+
+                <p
+                        id="header-subtitle"
+                        data-i18n="headerSubtitle">
+                    Parlamentarische Geschäfte beobachten,
+                    relevante Themen erkennen und informiert bleiben.
+                </p>
+            </div>
+
+            <div
+                    class="language-switcher"
+                    aria-label="Sprache">
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="de">
+                    DE
+                </button>
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="fr">
+                    FR
+                </button>
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="it">
+                    IT
+                </button>
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="en">
+                    EN
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="dashboard">
+
+    <!-- =====================================================
+         LEFT COLUMN
+         SUBSCRIPTIONS
+         ===================================================== -->
+
+    <aside class="dashboard-column left-column">
+
+        <section class="card subscription-card">
+
+            <div class="section-kicker"
+                 data-i18n="monitoring">
+                WWF Polit-Monitoring
+            </div>
+
+            <!-- =============================================
+                 START
+                 ============================================= -->
+
+            <div id="subscription-start">
+
+                <h2 data-i18n="missNothing">
+                    Nichts Relevantes verpassen
+                </h2>
+
+                <p data-i18n="subscriptionDescription">
+                    Abonnieren Sie Ihre WWF-Themen und erhalten Sie
+                    automatisch Hinweise zu neuen relevanten Geschäften
+                    und bevorstehenden Traktanden.
+                </p>
+
+                <div class="subscription-note">
+
+                    <p data-i18n="subscriptionNote">
+                        Bleiben Sie informiert, wenn sich im Parlament
+                        etwas zu Ihren Themen bewegt – von neuen
+                        Geschäften bis zu relevanten Sessionstraktanden.
+                    </p>
+
+                </div>
+
+                <div class="subscription-start-actions">
+
+                    <button
+                            id="show-subscribe-button"
+                            type="button"
+                            class="primary-button"
+                            data-i18n="subscribeTopics">
+                        Themen abonnieren
+                    </button>
+
+                    <button
+                            id="show-manage-button"
+                            type="button"
+                            class="secondary-button"
+                            data-i18n="manageSubscription">
+                        Bestehendes Abonnement verwalten
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 CREATE SUBSCRIPTION
+                 ============================================= -->
+
+            <div
+                    id="subscription-create"
+                    class="hidden">
+
+                <button
+                        id="cancel-subscribe-button"
+                        type="button"
+                        class="text-button"
+                        data-i18n="back">
+                    ← Zurück
+                </button>
+
+                <h2 data-i18n="subscribeMyTopics">
+                    Meine WWF-Themen abonnieren
+                </h2>
+
+                <p data-i18n="selectTopics">
+                    Wählen Sie die Themen aus, über die Sie
+                    automatisch informiert werden möchten.
+                </p>
+
+                <form id="subscription-form">
+
+                    <div class="form-group">
+
+                        <label
+                                for="subscription-name"
+                                data-i18n="name">
+                            Name
+                        </label>
+
+                        <input
+                                id="subscription-name"
+                                type="text"
+                                autocomplete="name">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                                for="subscription-email"
+                                data-i18n="email">
+                            E-Mail
+                        </label>
+
+                        <input
+                                id="subscription-email"
+                                type="email"
+                                autocomplete="email"
+                                required>
+
+                    </div>
+
+
+                    <fieldset class="topic-fieldset">
+
+                        <legend data-i18n="wwfTopics">
+                            WWF-Themen
+                        </legend>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Energie">
+
+                            <span data-topic-label="Energie">
+                                Energie
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Biodiversität">
+
+                            <span data-topic-label="Biodiversität">
+                                Biodiversität
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Wasser">
+
+                            <span data-topic-label="Wasser">
+                                Wasser
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Landwirtschaft">
+
+                            <span data-topic-label="Landwirtschaft">
+                                Landwirtschaft
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Raumplanung">
+
+                            <span data-topic-label="Raumplanung">
+                                Raumplanung
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Klima">
+
+                            <span data-topic-label="Klima">
+                                Klima
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Mobilität">
+
+                            <span data-topic-label="Mobilität">
+                                Mobilität
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="subscription-topic"
+                                    value="Abfall">
+
+                            <span data-topic-label="Abfall">
+                                Abfall
+                            </span>
+                        </label>
+
+                    </fieldset>
+
+
+                    <button
+                            type="submit"
+                            class="primary-button"
+                            data-i18n="subscribeNow">
+                        Jetzt informieren lassen
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- =============================================
+                 REQUEST MANAGEMENT LINK
+                 ============================================= -->
+
+            <div
+                    id="subscription-manage-request"
+                    class="hidden">
+
+                <button
+                        id="cancel-manage-button"
+                        type="button"
+                        class="text-button"
+                        data-i18n="back">
+                    ← Zurück
+                </button>
+
+                <h2 data-i18n="manageTitle">
+                    Abonnement verwalten
+                </h2>
+
+                <p data-i18n="manageDescription">
+                    Geben Sie Ihre E-Mail-Adresse ein.
+                    Wir senden Ihnen einen sicheren Link zur
+                    Verwaltung Ihres Abonnements.
+                </p>
+
+                <form id="management-request-form">
+
+                    <div class="form-group">
+
+                        <label
+                                for="management-email"
+                                data-i18n="email">
+                            E-Mail
+                        </label>
+
+                        <input
+                                id="management-email"
+                                type="email"
+                                autocomplete="email"
+                                required>
+
+                    </div>
+
+                    <button
+                            type="submit"
+                            class="primary-button"
+                            data-i18n="sendManagementLink">
+                        Verwaltungslink senden
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- =============================================
+                 MAIL SENT
+                 ============================================= -->
+
+            <div
+                    id="subscription-mail-sent"
+                    class="hidden">
+
+                <div class="subscription-success-icon">
+                    ✓
+                </div>
+
+                <h2 data-i18n="emailSent">
+                    E-Mail gesendet
+                </h2>
+
+                <p
+                        id="subscription-mail-sent-text"
+                        data-i18n="checkInbox">
+                    Bitte prüfen Sie Ihr Postfach.
+                </p>
+
+                <button
+                        id="mail-sent-home-button"
+                        type="button"
+                        class="secondary-button"
+                        data-i18n="back">
+                    Zurück
+                </button>
+
+            </div>
+
+
+            <!-- =============================================
+                 LOADING
+                 ============================================= -->
+
+            <div
+                    id="subscription-loading"
+                    class="hidden">
+
+                <div class="loading-indicator"></div>
+
+                <h2
+                        id="subscription-loading-title"
+                        data-i18n="subscriptionLoading">
+                    Abonnement wird geladen...
+                </h2>
+
+                <p data-i18n="pleaseWait">
+                    Bitte warten Sie einen Moment.
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 ACTIVE SUBSCRIPTION
+                 ============================================= -->
+
+            <div
+                    id="subscription-active"
+                    class="hidden">
+
+                <div class="subscription-success-icon">
+                    ✓
+                </div>
+
+                <div class="section-kicker"
+                     data-i18n="emailConfirmed">
+                    E-Mail-Adresse bestätigt
+                </div>
+
+                <h2 data-i18n="subscriptionActive">
+                    Abonnement aktiv
+                </h2>
+
+                <p>
+                    <span data-i18n="hello">
+                        Guten Tag
+                    </span>
+
+                    <strong id="active-display-name"></strong>
+                </p>
+
+                <p>
+                    <span data-i18n="registeredWith">
+                        Sie sind mit
+                    </span>
+
+                    <strong id="active-email"></strong>
+
+                    <span data-i18n="registeredTopics">
+                        für folgende WWF-Themen angemeldet:
+                    </span>
+                </p>
+
+                <div
+                        id="active-topics"
+                        class="active-topics">
+                </div>
+
+                <p
+                        class="subscription-note"
+                        data-i18n="activeSubscriptionNote">
+                    Wir informieren Sie per E-Mail über neue
+                    relevante parlamentarische Geschäfte und
+                    bevorstehende Traktanden zu Ihren Themen.
+                </p>
+
+                <div class="subscription-start-actions">
+
+                    <button
+                            id="edit-subscription-button"
+                            type="button"
+                            class="primary-button"
+                            data-i18n="updateTopics">
+                        Themen aktualisieren
+                    </button>
+
+                    <button
+                            id="delete-subscription-button"
+                            type="button"
+                            class="danger-button"
+                            data-i18n="deleteSubscription">
+                        Abonnement löschen
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 EDIT SUBSCRIPTION
+                 ============================================= -->
+
+            <div
+                    id="subscription-edit"
+                    class="hidden">
+
+                <h2 data-i18n="updateTopics">
+                    Themen aktualisieren
+                </h2>
+
+                <p>
+                    <strong id="edit-email"></strong>
+                </p>
+
+                <p data-i18n="continueTopics">
+                    Wählen Sie die WWF-Themen aus,
+                    über die Sie weiterhin informiert
+                    werden möchten.
+                </p>
+
+                <form id="subscription-edit-form">
+
+                    <fieldset class="topic-fieldset">
+
+                        <legend data-i18n="wwfTopics">
+                            WWF-Themen
+                        </legend>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Energie">
+
+                            <span data-topic-label="Energie">
+                                Energie
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Biodiversität">
+
+                            <span data-topic-label="Biodiversität">
+                                Biodiversität
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Wasser">
+
+                            <span data-topic-label="Wasser">
+                                Wasser
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Landwirtschaft">
+
+                            <span data-topic-label="Landwirtschaft">
+                                Landwirtschaft
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Raumplanung">
+
+                            <span data-topic-label="Raumplanung">
+                                Raumplanung
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Klima">
+
+                            <span data-topic-label="Klima">
+                                Klima
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Mobilität">
+
+                            <span data-topic-label="Mobilität">
+                                Mobilität
+                            </span>
+                        </label>
+
+                        <label class="topic-option">
+                            <input
+                                    type="checkbox"
+                                    name="edit-topic"
+                                    value="Abfall">
+
+                            <span data-topic-label="Abfall">
+                                Abfall
+                            </span>
+                        </label>
+
+                    </fieldset>
+
+
+                    <div class="subscription-start-actions">
+
+                        <button
+                                type="submit"
+                                class="primary-button"
+                                data-i18n="saveChanges">
+                            Änderungen speichern
+                        </button>
+
+                        <button
+                                id="cancel-edit-button"
+                                type="button"
+                                class="secondary-button"
+                                data-i18n="cancel">
+                            Abbrechen
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- =============================================
+                 RESULT
+                 ============================================= -->
+
+            <div
+                    id="subscription-result"
+                    class="hidden">
+
+                <div class="subscription-success-icon">
+                    ✓
+                </div>
+
+                <h2
+                        id="subscription-result-title"
+                        data-i18n="successful">
+                    Erfolgreich
+                </h2>
+
+                <p id="subscription-result-text"></p>
+
+                <button
+                        id="subscription-result-home-button"
+                        type="button"
+                        class="primary-button"
+                        data-i18n="toOverview">
+                    Zur Übersicht
+                </button>
+
+            </div>
+
+
+            <div
+                    id="subscription-status"
+                    class="status hidden">
+            </div>
+
+        </section>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CENTER COLUMN
+         AFFAIRS
+         ===================================================== -->
+
+    <section class="dashboard-column center-column">
+
+        <section class="card affairs-card">
+
+            <div
+                    class="section-kicker"
+                    data-i18n="affairsKicker">
+                Polit-Monitoring
+            </div>
+
+            <h2 data-i18n="affairsTitle">
+                Parlamentarische Geschäfte
+            </h2>
+
+            <p
+                    class="section-description"
+                    data-i18n="affairsDescription">
+                Durchsuchen Sie parlamentarische Geschäfte
+                und filtern Sie nach WWF-Themen.
+            </p>
+
+
+            <form
+                    id="search-form"
+                    class="search-form">
+
+                <div class="form-group search-query-group">
+
+                    <label
+                            for="search-input"
+                            data-i18n="searchTerm">
+                        Suchbegriff
+                    </label>
+
+                    <input
+                            id="search-input"
+                            type="search"
+                            data-i18n-placeholder="searchPlaceholder"
+                            placeholder="z. B. Gewässer, Solarenergie, Pestizide">
+
+                </div>
+
+
+                <div class="form-group search-topic-group">
+
+                    <label
+                            for="topic-select"
+                            data-i18n="wwfTopic">
+                        WWF-Thema
+                    </label>
+
+                    <select id="topic-select">
+
+                        <option
+                                value=""
+                                data-i18n="allTopics">
+                            Alle Themen
+                        </option>
+
+                        <option value="Energie">
+                            Energie
+                        </option>
+
+                        <option value="Biodiversität">
+                            Biodiversität
+                        </option>
+
+                        <option value="Wasser">
+                            Wasser
+                        </option>
+
+                        <option value="Landwirtschaft">
+                            Landwirtschaft
+                        </option>
+
+                        <option value="Raumplanung">
+                            Raumplanung
+                        </option>
+
+                        <option value="Klima">
+                            Klima
+                        </option>
+
+                        <option value="Mobilität">
+                            Mobilität
+                        </option>
+
+                        <option value="Abfall">
+                            Abfall
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                        type="submit"
+                        class="primary-button search-button"
+                        data-i18n="search">
+                    Suchen
+                </button>
+
+            </form>
+
+
+            <div
+                    id="affairs-status"
+                    class="status"
+                    data-i18n="affairsLoading">
+                Geschäfte werden geladen...
+            </div>
+
+
+            <div
+                    id="affairs-list"
+                    class="results-list">
+            </div>
+
+
+            <div class="pagination">
+
+                <button
+                        id="previous-page"
+                        type="button"
+                        class="secondary-button"
+                        data-i18n="previous">
+                    Zurück
+                </button>
+
+                <span id="page-info">
+                    Seite 1
+                </span>
+
+                <button
+                        id="next-page"
+                        type="button"
+                        class="secondary-button"
+                        data-i18n="next">
+                    Weiter
+                </button>
+
+            </div>
+
+        </section>
+
+    </section>
+
+
+    <!-- =====================================================
+         RIGHT COLUMN
+         MONITORING
+         ===================================================== -->
+
+    <aside class="dashboard-column right-column">
+
+        <!-- UPCOMING AGENDAS -->
+
+        <section class="card monitoring-card">
+
+            <div
+                    class="section-kicker"
+                    data-i18n="upcoming">
+                Demnächst
+            </div>
+
+            <h2 data-i18n="upcomingAgendas">
+                Bevorstehende relevante Traktanden
+            </h2>
+
+            <p
+                    class="section-description"
+                    data-i18n="upcomingDescription">
+                Die nächsten Sessionstraktanden
+                mit Bezug zu WWF-Themen.
+            </p>
+
+            <div
+                    id="agendas-status"
+                    class="status"
+                    data-i18n="agendasLoading">
+                Traktanden werden geladen...
+            </div>
+
+            <div
+                    id="agendas-list"
+                    class="monitoring-list">
+            </div>
+
+        </section>
+
+
+        <!-- LATEST AFFAIRS -->
+
+        <section class="card monitoring-card">
+
+            <div
+                    class="section-kicker"
+                    data-i18n="new">
+                Neu
+            </div>
+
+            <h2 data-i18n="newMonitoring">
+                Neu im Polit-Monitoring
+            </h2>
+
+            <p
+                    class="section-description"
+                    data-i18n="newDescription">
+                Die fünf neuesten parlamentarischen
+                Geschäfte im System.
+            </p>
+
+            <div
+                    id="latest-affairs-status"
+                    class="status"
+                    data-i18n="newLoading">
+                Neue Geschäfte werden geladen...
+            </div>
+
+            <div
+                    id="latest-affairs-list"
+                    class="monitoring-list">
+            </div>
+
+        </section>
+
+
+        <!-- INFORMATION -->
+
+        <section class="card info-card">
+
+            <div
+                    class="section-kicker"
+                    data-i18n="data">
+                Daten
+            </div>
+
+            <h2>WWF Polit-Assistant</h2>
+
+            <p data-i18n="dataDescription">
+                Der Polit-Assistant verbindet parlamentarische
+                Open Data mit einer automatischen
+                WWF-Themenklassifikation.
+            </p>
+
+
+            <div class="info-row">
+
+                <span data-i18n="dataSource">
+                    Datenquelle
+                </span>
+
+                <strong>
+                    OpenParlData.ch
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span data-i18n="wwfTopics">
+                    WWF-Themen
+                </span>
+
+                <strong data-i18n="eightTopics">
+                    8 Themen
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span data-i18n="dataUpdate">
+                    Datenaktualisierung
+                </span>
+
+                <strong data-i18n="automated">
+                    Automatisiert
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span data-i18n="notifications">
+                    Benachrichtigungen
+                </span>
+
+                <strong>
+                    E-Mail
+                </strong>
+
+            </div>
+
+        </section>
+
+    </aside>
+
+</main>
+
+
+<footer class="app-footer">
+
+    <div class="footer-content">
+
+        <span>
+            WWF Polit-Assistant
+        </span>
+
+        <span data-i18n="footerSource">
+            Datenquelle: OpenParlData.ch
+        </span>
+
+    </div>
+
+</footer>
+
+
+<script src="/js/i18n.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>

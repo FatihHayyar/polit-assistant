@@ -1,6 +1,7 @@
 package ch.hslu.wipro.politassistant.adapter.out.persistence.user;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,29 +28,67 @@ public class UserPreferenceEntity {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    protected UserPreferenceEntity() {}
+    protected UserPreferenceEntity() {
+    }
 
-    public UUID getId() { return id; }
-    public AppUserEntity getUser() { return user; }
-    public String getTopic() { return topic; }
-    public String getChannel() { return channel; }
-    public boolean isActive() { return active; }
+    public UUID getId() {
+        return id;
+    }
+
+    public AppUserEntity getUser() {
+        return user;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 
     public String getEmail() {
         return user.getEmail();
     }
-    public static UserPreferenceEntity create(
+
+    public void activate() {
+        this.active = true;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public static UserPreferenceEntity createPendingEmailSubscription(
             AppUserEntity user,
-            String topic,
-            String channel
+            String topic
     ) {
-        UserPreferenceEntity preference = new UserPreferenceEntity();
+        UserPreferenceEntity preference =
+                new UserPreferenceEntity();
+
         preference.id = UUID.randomUUID();
         preference.user = user;
         preference.topic = topic;
-        preference.channel = channel;
-        preference.active = true;
+        preference.channel = "EMAIL";
+        preference.active = false;
         preference.createdAt = LocalDateTime.now();
+
+        return preference;
+    }
+
+    public static UserPreferenceEntity createEmailSubscription(
+            AppUserEntity user,
+            String topic
+    ) {
+        UserPreferenceEntity preference =
+                createPendingEmailSubscription(user, topic);
+
+        preference.active = true;
+
         return preference;
     }
 }

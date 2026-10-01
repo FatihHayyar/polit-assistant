@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>WWF Polit-Assistant</title>
+
+    <link
+            rel="stylesheet"
+            href="/css/app.css">
+
+</head>
+
+
+<body>
+
+<header class="app-header">
+
+    <div class="header-content">
+
+        <div class="header-main">
+
+            <div>
+
+                <h1>WWF Polit-Assistant</h1>
+
+                <p
+                        id="header-subtitle"
+                        data-i18n="headerSubtitle">
+                    Parlamentarische Geschäfte beobachten,
+                    relevante Themen erkennen und informiert bleiben.
+                </p>
+
+            </div>
+
+
+            <div
+                    class="language-switcher"
+                    aria-label="Sprache">
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="de">
+                    DE
+                </button>
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="fr">
+                    FR
+                </button>
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="it">
+                    IT
+                </button>
+
+                <button
+                        type="button"
+                        class="language-button"
+                        data-language="en">
+                    EN
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="detail-page">
+
+    <div class="detail-container">
+
+        <!-- BACK -->
+
+        <a
+                href="/"
+                class="detail-back-link"
+                data-i18n="backOverview">
+            ← Zurück zur Übersicht
+        </a>
+
+
+        <!-- LOADING / ERROR -->
+
+        <div
+                id="affair-detail-status"
+                class="status">
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <article
+                id="affair-detail"
+                class="hidden">
+
+
+            <!-- =============================================
+                 HEADER
+                 ============================================= -->
+
+            <section class="card detail-header-card">
+
+                <div
+                        class="section-kicker"
+                        data-i18n="affairDetailKicker">
+                    Parlamentarisches Geschäft
+                </div>
+
+
+                <h2 id="affair-title">
+                </h2>
+
+
+                <p
+                        id="affair-title-long"
+                        class="detail-lead">
+                </p>
+
+
+                <div
+                        id="affair-meta"
+                        class="result-meta">
+                </div>
+
+
+                <div
+                        id="affair-actions"
+                        class="detail-actions">
+
+                    <a
+                            id="affair-source-link"
+                            class="primary-button"
+                            href="#"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-i18n="originalSource">
+                        Originalquelle öffnen ↗
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 CONTENT
+                 ============================================= -->
+
+            <section
+                    id="affair-content-section"
+                    class="card detail-section">
+
+                <div
+                        class="section-kicker"
+                        data-i18n="content">
+                    Inhalt
+                </div>
+
+                <h2 data-i18n="affairContent">
+                    Inhalt des Geschäfts
+                </h2>
+
+                <p
+                        class="section-description"
+                        data-i18n="affairContentDescription">
+                    Inhalt aus den bereits importierten
+                    parlamentarischen Dokumenten.
+                </p>
+
+
+                <div
+                        id="affair-content"
+                        class="affair-content-text">
+                </div>
+
+
+                <button
+                        id="toggle-content-button"
+                        type="button"
+                        class="text-button hidden"
+                        data-i18n="readMore">
+                    Weiterlesen ↓
+                </button>
+
+            </section>
+
+
+            <!-- =============================================
+                 WWF TOPICS
+                 ============================================= -->
+
+            <section
+                    id="affair-topics-section"
+                    class="card detail-section">
+
+                <div
+                        class="section-kicker"
+                        data-i18n="wwfRelevance">
+                    WWF-Relevanz
+                </div>
+
+                <h2 data-i18n="wwfTopics">
+                    WWF-Themen
+                </h2>
+
+                <p
+                        class="section-description"
+                        data-i18n="relevantTopics">
+                    Für dieses Geschäft erkannte relevante Themen.
+                </p>
+
+
+                <div
+                        id="affair-topics"
+                        class="active-topics">
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 DOCUMENTS
+                 ============================================= -->
+
+            <section
+                    id="affair-documents-section"
+                    class="card detail-section">
+
+                <div
+                        class="section-kicker"
+                        data-i18n="documents">
+                    Dokumente
+                </div>
+
+                <h2 data-i18n="relatedDocuments">
+                    Zugehörige Dokumente
+                </h2>
+
+                <p
+                        class="section-description"
+                        data-i18n="documentsDescription">
+                    Bereits importierte Dokumente zu diesem Geschäft.
+                </p>
+
+
+                <div
+                        id="affair-documents"
+                        class="detail-documents">
+                </div>
+
+            </section>
+
+
+            <!-- =============================================
+                 BOTTOM ACTIONS
+                 ============================================= -->
+
+            <section class="detail-bottom-actions">
+
+                <a
+                        href="/"
+                        class="secondary-button"
+                        data-i18n="backOverview">
+                    ← Zurück zur Übersicht
+                </a>
+
+                <a
+                        id="affair-source-link-bottom"
+                        class="primary-button"
+                        href="#"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-i18n="originalSource">
+                    Originalquelle öffnen ↗
+                </a>
+
+            </section>
+
+        </article>
+
+    </div>
+
+</main>
+
+
+<footer class="app-footer">
+
+    <div class="footer-content">
+
+        <span>
+            WWF Polit-Assistant
+        </span>
+
+        <span data-i18n="footerSource">
+            Datenquelle: OpenParlData.ch
+        </span>
+
+    </div>
+
+</footer>
+
+
+<script src="/js/i18n.js"></script>
+<script src="/js/affair-detail.js"></script>
+
+</body>
+
+</html>
