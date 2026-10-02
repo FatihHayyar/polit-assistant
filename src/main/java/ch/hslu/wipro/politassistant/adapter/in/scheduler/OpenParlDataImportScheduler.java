@@ -1,8 +1,7 @@
 package ch.hslu.wipro.politassistant.adapter.in.scheduler;
 
-import ch.hslu.wipro.politassistant.application.service.AlertService;
 import ch.hslu.wipro.politassistant.application.service.ImportJobService;
-import ch.hslu.wipro.politassistant.application.service.ImportOrchestratorService;
+import ch.hslu.wipro.politassistant.application.service.UpdateWorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,79 +11,69 @@ import org.springframework.stereotype.Component;
 public class OpenParlDataImportScheduler {
 
     private static final Logger log =
-            LoggerFactory.getLogger(OpenParlDataImportScheduler.class);
+            LoggerFactory.getLogger(
+                    OpenParlDataImportScheduler.class
+            );
 
     private final ImportJobService importJobService;
-    private final ImportOrchestratorService orchestratorService;
-    private final AlertService alertService;
+    private final UpdateWorkflowService updateWorkflowService;
 
     public OpenParlDataImportScheduler(
             ImportJobService importJobService,
-            ImportOrchestratorService orchestratorService,
-            AlertService alertService
+            UpdateWorkflowService updateWorkflowService
     ) {
-        this.importJobService = importJobService;
-        this.orchestratorService = orchestratorService;
-        this.alertService = alertService;
+        this.importJobService =
+                importJobService;
+
+        this.updateWorkflowService =
+                updateWorkflowService;
     }
 
     @Scheduled(cron = "0 30 6 * * *")
-    public void runMorningImport() {
+    public void runMorningUpdate() {
 
         var jobId =
                 importJobService.start(
-                        "OPENPARLDATA_AFFAIRS_INCREMENTAL_IMPORT"
+                        "OPENPARLDATA_INCREMENTAL_UPDATE"
                 );
 
         try {
             var result =
-                    orchestratorService.runIncrementalImport(50);
-
-            int sentNotifications =
-                    alertService.sendPendingAlerts();
+                    updateWorkflowService.runUpdate(
+                            50,
+                            50
+                    );
 
             importJobService.success(
                     jobId,
-                    result.affairsImported(),
+                    result.affairsUpdated()
+                            + result.meetingsUpdated(),
                     0,
-                    sentNotifications
+                    result.notificationsSent()
             );
 
             log.info(
-                    "Affair import completed: imported={}, alertsCreated={}, notificationsSent={}",
-                    result.affairsImported(),
+                    "Scheduled OpenParlData update completed: status={}, affairs={}, documents={}, meetings={}, agendas={}, alertsCreated={}, notificationsSent={}",
+                    result.status(),
+                    result.affairsUpdated(),
+                    result.documentsImported(),
+                    result.meetingsUpdated(),
+                    result.agendasImported(),
                     result.alertsCreated(),
-                    sentNotifications
+                    result.notificationsSent()
             );
 
-        } catch (Exception e) {
-            importJobService.failed(jobId, e.getMessage());
-            log.error("Affair import failed", e);
-        }
-    }
+        } catch (Exception exception) {
 
-    @Scheduled(cron = "0 35 6 * * *")
-    public void runMorningMeetingAgendaImport() {
-
-        var jobId =
-                importJobService.start(
-                        "OPENPARLDATA_MEETINGS_INCREMENTAL_IMPORT"
-                );
-
-        try {
-            var result =
-                    orchestratorService.runMeetingAgendaImport(50);
-
-            importJobService.success(
+            importJobService.failed(
                     jobId,
-                    result.importedMeetings(),
-                    0,
-                    0
+                    exception.getMessage()
             );
 
-        } catch (Exception e) {
-            importJobService.failed(jobId, e.getMessage());
-            log.error("Meeting/Agenda import failed", e);
+            log.error(
+                    "Scheduled OpenParlData update failed",
+                    exception
+            );
         }
     }
 }

@@ -7,13 +7,19 @@ import java.util.UUID;
 
 public interface AlertJpaRepository extends JpaRepository<AlertEntity, UUID> {
 
-    boolean existsByAffairIdAndTopicAndChannelAndRecipientEmail(
-            Long affairId,
+    boolean existsByEventKeyAndTopicAndChannelAndRecipientEmail(
+            String eventKey,
             String topic,
             String channel,
             String recipientEmail
     );
+
     long countByStatus(String status);
+
     List<AlertEntity> findByStatus(String status);
-    List<AlertEntity> findByStatusInAndRetryCountLessThan(List<String> statuses, int retryCount);
+
+    List<AlertEntity> findByStatusInAndRetryCountLessThan(
+            List<String> statuses,
+            int retryCount
+    );
 }

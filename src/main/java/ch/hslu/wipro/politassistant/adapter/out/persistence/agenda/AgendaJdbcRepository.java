@@ -4,16 +4,60 @@ import ch.hslu.wipro.politassistant.adapter.out.openparldata.dto.OpenParlDataAge
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Repository
 public class AgendaJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public AgendaJdbcRepository(JdbcTemplate jdbcTemplate) {
+    public AgendaJdbcRepository(
+            JdbcTemplate jdbcTemplate
+    ) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void upsert(AgendaDto agenda) {
+    public Optional<AgendaSnapshot> findSnapshot(
+            Long agendaId
+    ) {
+        var rows =
+                jdbcTemplate.query(
+                        """
+                        SELECT
+                            id,
+                            affair_id,
+                            item_date
+                        FROM agendas
+                        WHERE id = ?
+                        """,
+                        (rs, rowNum) ->
+                                new AgendaSnapshot(
+                                        rs.getLong("id"),
+                                        rs.getObject(
+                                                "affair_id",
+                                                Long.class
+                                        ),
+                                        rs.getObject(
+                                                "item_date",
+                                                LocalDateTime.class
+                                        )
+                                ),
+                        agendaId
+                );
+
+        if (rows.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+                rows.getFirst()
+        );
+    }
+
+    public void upsert(
+            AgendaDto agenda
+    ) {
         String sql = """
                 INSERT INTO agendas (
                     id,
@@ -81,5 +125,12 @@ public class AgendaJdbcRepository {
                 agenda.item_language(),
                 agenda.created_at()
         );
+    }
+
+    public record AgendaSnapshot(
+            Long id,
+            Long affairId,
+            LocalDateTime itemDate
+    ) {
     }
 }

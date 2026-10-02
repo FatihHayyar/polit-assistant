@@ -1,6 +1,8 @@
 package ch.hslu.wipro.politassistant.adapter.out.persistence.alert;
 
+import ch.hslu.wipro.politassistant.domain.alert.AlertEventType;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,6 +25,13 @@ public class AlertEntity {
     @Column(nullable = false)
     private String status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "event_type", nullable = false)
+    private AlertEventType eventType;
+
+    @Column(name = "event_key", nullable = false)
+    private String eventKey;
+
     @Column(nullable = false)
     private String title;
 
@@ -41,53 +50,101 @@ public class AlertEntity {
     @Column(name = "last_error")
     private String lastError;
 
-    @Column(name= "recipient_email")
+    @Column(name = "recipient_email")
     private String recipientEmail;
 
-    protected AlertEntity() {}
+    protected AlertEntity() {
+    }
 
     public static AlertEntity pending(
             Long affairId,
             String topic,
             String channel,
             String recipientEmail,
+            AlertEventType eventType,
+            String eventKey,
             String title,
             String message
     ) {
         AlertEntity alert = new AlertEntity();
+
         alert.id = UUID.randomUUID();
         alert.affairId = affairId;
         alert.topic = topic;
         alert.channel = channel;
         alert.recipientEmail = recipientEmail;
+        alert.eventType = eventType;
+        alert.eventKey = eventKey;
         alert.status = "PENDING";
         alert.title = title;
         alert.message = message;
         alert.createdAt = LocalDateTime.now();
         alert.retryCount = 0;
+
         return alert;
     }
-    public String getTitle() { return title; }
-    public String getMessage() { return message; }
-    public String getChannel() { return channel; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public String getRecipientEmail() { return recipientEmail; }
 
     public void markSent() {
         this.status = "SENT";
         this.sentAt = LocalDateTime.now();
         this.lastError = null;
     }
+
     public void markFailed(String errorMessage) {
         this.status = "FAILED";
         this.retryCount++;
         this.lastError = errorMessage;
     }
 
-    public UUID getId() { return id; }
-    public Long getAffairId() { return affairId; }
-    public String getTopic() { return topic; }
-    public String getStatus() { return status; }
-    public int getRetryCount() { return retryCount; }
-    public String getLastError() { return lastError; }
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getAffairId() {
+        return affairId;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public AlertEventType getEventType() {
+        return eventType;
+    }
+
+    public String getEventKey() {
+        return eventKey;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getRecipientEmail() {
+        return recipientEmail;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public String getLastError() {
+        return lastError;
+    }
 }

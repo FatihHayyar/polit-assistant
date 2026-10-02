@@ -3,7 +3,12 @@ package ch.hslu.wipro.politassistant.application.service;
 import ch.hslu.wipro.politassistant.adapter.out.openparldata.OpenParlDataClient;
 import ch.hslu.wipro.politassistant.adapter.out.openparldata.dto.OpenParlDataMeetingsResponse;
 import ch.hslu.wipro.politassistant.adapter.out.persistence.meeting.MeetingJdbcRepository;
+import ch.hslu.wipro.politassistant.domain.alert.AlertEvent;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MeetingAgendaImportService {
@@ -15,7 +20,9 @@ public class MeetingAgendaImportService {
 
     public MeetingAgendaImportService(
             MeetingImportService meetingImportService,
-            AgendaImportService agendaImportService, OpenParlDataClient client, MeetingJdbcRepository meetingRepository
+            AgendaImportService agendaImportService,
+            OpenParlDataClient client,
+            MeetingJdbcRepository meetingRepository
     ) {
         this.meetingImportService = meetingImportService;
         this.agendaImportService = agendaImportService;
@@ -23,45 +30,71 @@ public class MeetingAgendaImportService {
         this.meetingRepository = meetingRepository;
     }
 
-    public int importMeetingWithAgendas(Long meetingId) {
+    public int importMeetingWithAgendas(
+            Long meetingId
+    ) {
         boolean meetingImported =
-                meetingImportService.importMeetingById(meetingId);
+                meetingImportService.importMeetingById(
+                        meetingId
+                );
 
         if (!meetingImported) {
             return 0;
         }
 
-        return agendaImportService.importAgendasForMeeting(meetingId);
+        return agendaImportService.importAgendasForMeeting(
+                meetingId
+        );
     }
-    public ImportResult importMeetingPageWithAgendas(int offset, int limit) {
 
+    public ImportResult importMeetingPageWithAgendas(
+            int offset,
+            int limit
+    ) {
         OpenParlDataMeetingsResponse response =
-                client.fetchMeetings(offset, limit, "-updated_at");
+                client.fetchMeetings(
+                        offset,
+                        limit,
+                        "-updated_at"
+                );
 
         if (response == null
                 || response.data() == null
                 || response.data().isEmpty()) {
 
-            return new ImportResult(0, 0, null);
+            return new ImportResult(
+                    0,
+                    0,
+                    null,
+                    new ArrayList<>(),
+                    new ArrayList<>()
+            );
         }
 
         int importedMeetings = 0;
         int importedAgendas = 0;
-        java.time.LocalDateTime maxUpdatedAt = null;
+        LocalDateTime maxUpdatedAt = null;
 
-        for (OpenParlDataMeetingsResponse.MeetingDto meeting : response.data()) {
+        for (OpenParlDataMeetingsResponse.MeetingDto meeting
+                : response.data()) {
 
             meetingRepository.upsert(meeting);
             importedMeetings++;
 
             importedAgendas +=
-                    agendaImportService.importAgendasForMeeting(meeting.id());
+                    agendaImportService.importAgendasForMeeting(
+                            meeting.id()
+                    );
 
             if (meeting.updated_at() != null) {
                 var updatedAt =
-                        java.time.LocalDateTime.parse(meeting.updated_at());
+                        LocalDateTime.parse(
+                                meeting.updated_at()
+                        );
 
-                if (maxUpdatedAt == null || updatedAt.isAfter(maxUpdatedAt)) {
+                if (maxUpdatedAt == null
+                        || updatedAt.isAfter(maxUpdatedAt)) {
+
                     maxUpdatedAt = updatedAt;
                 }
             }
@@ -70,20 +103,30 @@ public class MeetingAgendaImportService {
         return new ImportResult(
                 importedMeetings,
                 importedAgendas,
-                maxUpdatedAt
+                maxUpdatedAt,
+                new ArrayList<>(),
+                new ArrayList<>()
         );
     }
+
     public ImportResult importMeetingsWithAgendas(
             int offset,
             int limit,
-            java.time.LocalDateTime lastSync
+            LocalDateTime lastSync
     ) {
         int currentOffset = offset;
         int importedMeetings = 0;
         int importedAgendas = 0;
-        java.time.LocalDateTime maxUpdatedAt = null;
+
+        LocalDateTime maxUpdatedAt = null;
 
         boolean reachedLastSync = false;
+
+        List<AlertEvent> events =
+                new ArrayList<>();
+
+        List<Long> importedMissingAffairIds =
+                new ArrayList<>();
 
         while (true) {
 
@@ -100,16 +143,23 @@ public class MeetingAgendaImportService {
                 break;
             }
 
-            for (OpenParlDataMeetingsResponse.MeetingDto meeting : response.data()) {
+            for (OpenParlDataMeetingsResponse.MeetingDto meeting
+                    : response.data()) {
 
-                java.time.LocalDateTime updatedAt = null;
+                LocalDateTime updatedAt = null;
 
                 if (meeting.updated_at() != null) {
-                    updatedAt = java.time.LocalDateTime.parse(
-                            meeting.updated_at()
-                    );
+                    updatedAt =
+                            LocalDateTime.parse(
+                                    meeting.updated_at()
+                            );
                 }
 
+                /*
+                 * Meetings are sorted by -updated_at.
+                 * Once the previous checkpoint is reached, all following
+                 * meetings are older and do not need to be processed.
+                 */
                 if (lastSync != null
                         && updatedAt != null
                         && !updatedAt.isAfter(lastSync)) {
@@ -121,10 +171,22 @@ public class MeetingAgendaImportService {
                 meetingRepository.upsert(meeting);
                 importedMeetings++;
 
+                var agendaResult =
+                        agendaImportService
+                                .importAgendasForMeetingIncremental(
+                                        meeting.id()
+                                );
+
                 importedAgendas +=
-                        agendaImportService.importAgendasForMeeting(
-                                meeting.id()
-                        );
+                        agendaResult.importedAgendas();
+
+                events.addAll(
+                        agendaResult.events()
+                );
+
+                importedMissingAffairIds.addAll(
+                        agendaResult.importedMissingAffairIds()
+                );
 
                 if (updatedAt != null
                         && (maxUpdatedAt == null
@@ -134,8 +196,6 @@ public class MeetingAgendaImportService {
                 }
             }
 
-            // sorted by -updated_at:
-            // once lastSync is reached, older pages are irrelevant
             if (reachedLastSync) {
                 break;
             }
@@ -151,13 +211,18 @@ public class MeetingAgendaImportService {
         return new ImportResult(
                 importedMeetings,
                 importedAgendas,
-                maxUpdatedAt
+                maxUpdatedAt,
+                events,
+                importedMissingAffairIds
         );
     }
 
     public record ImportResult(
             int importedMeetings,
             int importedAgendas,
-            java.time.LocalDateTime maxUpdatedAt
-    ) {}
+            LocalDateTime maxUpdatedAt,
+            List<AlertEvent> events,
+            List<Long> importedMissingAffairIds
+    ) {
+    }
 }
