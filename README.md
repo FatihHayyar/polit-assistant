@@ -208,17 +208,18 @@ Implemented subscription lifecycle:
 - ✅ Email verification
 - ✅ Secure verification tokens
 - ✅ Subscription activation
+- ✅ Detection of already active subscriptions
 - ✅ Request secure management link
 - ✅ View current subscription
 - ✅ Update subscribed topics
 - ✅ Delete subscription
+- ✅ Complete removal of deleted subscription data
 - ✅ Token expiration
 - ✅ Hashed token storage
-- ✅ Generic responses to prevent email-address enumeration
 
 Management links are sent by email instead of exposing subscription data through a public email lookup.
 
----
+If an active subscription already exists, the application informs the user and directs them to the subscription management workflow instead of creating a duplicate subscription.
 
 ## Email Notifications
 
