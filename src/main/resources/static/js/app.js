@@ -649,22 +649,32 @@ async function subscribe(event) {
                 }
             );
 
-        await readJsonSafely(
-            response
-        );
+        const body =
+            await readJsonSafely(
+                response
+            );
 
         if (!response.ok) {
 
-            /*
-             * We deliberately do not expose backend details here.
-             * This also prevents German backend validation messages
-             * from leaking into another UI language.
-             */
             throw new Error(
                 PolitI18n.t(
                     "subscriptionRequestFailed"
                 )
             );
+        }
+
+        if (
+            body?.message ===
+            "Für diese E-Mail-Adresse besteht bereits ein aktives Abonnement."
+        ) {
+
+            showSubscriptionError(
+                PolitI18n.t(
+                    "subscriptionAlreadyActive"
+                )
+            );
+
+            return;
         }
 
         subscriptionForm.reset();
@@ -746,17 +756,38 @@ async function requestManagementLink(
                 }
             );
 
-        await readJsonSafely(
-            response
-        );
+        const body =
+            await readJsonSafely(
+                response
+            );
 
         if (!response.ok) {
 
             throw new Error(
+                body?.message ||
                 PolitI18n.t(
                     "requestFailed"
                 )
             );
+        }
+
+        /*
+         * The backend explicitly tells us whether an active
+         * subscription exists. Do not show a generic
+         * "E-Mail sent" screen for an inactive or unknown address.
+         */
+        if (
+            body?.message ===
+            "Für diese E-Mail-Adresse besteht kein aktives Abonnement."
+        ) {
+
+            showSubscriptionError(
+                PolitI18n.t(
+                    "noActiveSubscription"
+                )
+            );
+
+            return;
         }
 
         managementRequestForm.reset();

@@ -1338,3 +1338,85 @@ button:disabled {
         align-self: flex-start;
     }
 }
+/* =========================================================
+   DETAIL BOTTOM ACTIONS
+   ========================================================= */
+
+.detail-bottom-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-top: 18px;
+    padding-top: 18px;
+
+    border-top: 1px solid var(--border);
+}
+
+.detail-bottom-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 44px;
+    padding: 10px 16px;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   SUBSCRIPTION START ACTIONS
+   ========================================================= */
+
+.subscription-start-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+
+    width: 100%;
+    margin-top: 18px;
+}
+
+.subscription-start-actions .primary-button,
+.subscription-start-actions .secondary-button,
+.subscription-start-actions .danger-button {
+    width: 100%;
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 11px 14px;
+
+    text-align: center;
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   RESPONSIVE ACTIONS
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+    .detail-bottom-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .detail-bottom-button {
+        width: 100%;
+    }
+}

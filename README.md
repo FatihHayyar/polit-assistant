@@ -1,56 +1,140 @@
 # WWF Polit-Assistant
 
-Open-data-based political monitoring assistant for WWF Switzerland.
+Open-Data-basierter Polit-Monitoring-Assistent für WWF Schweiz.
 
-The application imports parliamentary data from OpenParlData, structures and classifies parliamentary affairs into WWF-relevant topics, provides search and monitoring functionality, and notifies subscribed users about relevant developments.
+Die Anwendung importiert parlamentarische Daten aus OpenParlData, speichert und verknüpft diese strukturiert, klassifiziert parlamentarische Geschäfte nach WWF-relevanten Themen und stellt Such-, Monitoring- und Benachrichtigungsfunktionen bereit.
 
-The current project focus is a working, transparent MVP. AI-based features are considered optional extensions and are not required for the core system.
-
----
-
-# Project Goal
-
-The WWF Polit-Assistant supports the monitoring of Swiss parliamentary affairs.
-
-The MVP focuses on:
-
-- automatic import and synchronization of parliamentary data
-- structured storage of affairs, documents, meetings and agenda items
-- rule-based classification into WWF-relevant topics
-- search and filtering
-- detection of new relevant parliamentary affairs
-- monitoring of relevant session agenda items
-- topic subscriptions
-- email notifications
-- a documented REST API
-- a simple multilingual web interface
-
-The application uses parliamentary data provided by OpenParlData.
-
-Source: OpenParlData.ch
+Der aktuelle Projektfokus liegt auf einem funktionierenden und transparenten MVP. KI-basierte Funktionen sind optionale Erweiterungen und für das Kernsystem nicht erforderlich.
 
 ---
 
-# WWF Topics
+# Projektziel
 
-The current rule-based classifier supports the following WWF topics:
+Der WWF Polit-Assistant unterstützt das Monitoring parlamentarischer Geschäfte in der Schweiz.
 
-- Energy
-- Biodiversity
-- Water
-- Agriculture
-- Spatial Planning
-- Climate
-- Mobility
-- Waste
+Der MVP konzentriert sich auf:
 
-Affairs without sufficient evidence for one of these topics are classified internally as `SONSTIGES`.
+- automatischen Import und regelmässige Synchronisierung parlamentarischer Daten
+- strukturierte Speicherung von Geschäften, Dokumenten, Sitzungen und Traktanden
+- regelbasierte Klassifikation nach WWF-relevanten Themen
+- Suche und Filterung
+- Erkennung neuer relevanter parlamentarischer Geschäfte
+- Monitoring relevanter Sessionstraktanden
+- Themen-Abonnements
+- E-Mail-Benachrichtigungen
+- eine dokumentierte REST-API
+- eine einfache mehrsprachige Weboberfläche
 
-Classification rules are configurable and can use both affair metadata and imported parliamentary document content.
+Die Anwendung verwendet parlamentarische Daten von OpenParlData.
+
+**Quelle: OpenParlData.ch**
 
 ---
 
-# Tech Stack
+# Quick Start mit Docker
+
+Für die lokale Ausführung des MVP werden lediglich **Git** und **Docker Desktop** benötigt.
+
+Eine separate Installation von Java, Maven oder PostgreSQL ist für diesen Weg nicht erforderlich.
+
+## 1. Repository klonen
+
+```bash
+git clone https://github.com/FatihHayyar/polit-assistant.git
+cd polit-assistant
+```
+
+## 2. Anwendung starten
+
+```bash
+docker compose up --build -d
+```
+
+Docker startet automatisch:
+
+- die Spring-Boot-Anwendung
+- PostgreSQL 17
+- die Flyway-Datenbankmigrationen
+- Mailpit als lokalen Mailserver
+
+Bei einer neuen und leeren Datenbank wird zusätzlich automatisch ein kleiner Startdatenbestand aus OpenParlData geladen.
+
+Standardmässig werden:
+
+- 50 parlamentarische Geschäfte importiert
+- die zugehörigen parlamentarischen Dokumente importiert
+- die importierten Geschäfte automatisch nach WWF-Themen klassifiziert
+
+Der Bootstrap wird nur ausgeführt, wenn die Datenbank noch keine parlamentarischen Geschäfte enthält.
+
+Bereits vorhandene Datenbestände werden nicht überschrieben oder zurückgesetzt.
+
+## 3. Anwendung öffnen
+
+Nach dem Start stehen folgende Dienste zur Verfügung:
+
+| Dienst | Adresse |
+|---|---|
+| Polit-Assistant | `http://localhost:8081` |
+| Swagger / OpenAPI | `http://localhost:8081/swagger-ui/index.html` |
+| Mailpit | `http://localhost:8025` |
+| PostgreSQL | `localhost:5433` |
+
+## Lokale E-Mails testen
+
+Im Docker-Setup werden E-Mails nicht über einen externen SMTP-Provider versendet.
+
+Stattdessen verwendet die Anwendung **Mailpit** als lokalen SMTP-Server. Dadurch können die E-Mail-Funktionen des MVP ohne externe Zugangsdaten getestet werden.
+
+Unter anderem können damit folgende Abläufe getestet werden:
+
+- E-Mail-Verifikation bei einer neuen Themen-Subscription
+- Aktivierung eines Abonnements
+- Versand eines sicheren Verwaltungslinks
+- Änderung bestehender Themen-Abonnements
+- Löschung eines Abonnements
+- Benachrichtigungen über relevante parlamentarische Entwicklungen
+
+Alle erzeugten E-Mails können unter folgender Adresse eingesehen werden:
+
+```text
+http://localhost:8025
+```
+
+Für den Docker-Quick-Start werden keine Gmail- oder anderen externen SMTP-Zugangsdaten benötigt.
+
+## Container stoppen
+
+```bash
+docker compose down
+```
+
+Die PostgreSQL-Daten bleiben dabei im Docker-Volume erhalten und stehen beim nächsten Start wieder zur Verfügung.
+
+> **Achtung:** `docker compose down -v` entfernt zusätzlich das Docker-Volume der Datenbank und löscht damit den lokalen Datenbestand. Dieser Befehl sollte nur verwendet werden, wenn die Datenbank bewusst vollständig zurückgesetzt werden soll.
+
+---
+
+# WWF-Themen
+
+Der aktuelle regelbasierte Klassifikator unterstützt folgende WWF-Themen:
+
+- Energie
+- Biodiversität
+- Wasser
+- Landwirtschaft
+- Raumplanung
+- Klima
+- Mobilität
+- Abfall
+
+Geschäfte ohne ausreichende Evidenz für eines dieser Themen werden intern als `SONSTIGES` klassifiziert.
+
+Die Klassifikationsregeln sind konfigurierbar und können sowohl Metadaten eines parlamentarischen Geschäfts als auch importierte Dokumentinhalte berücksichtigen.
+
+---
+
+# Technologie-Stack
 
 - Java 25
 - Spring Boot 4.1
@@ -59,9 +143,10 @@ Classification rules are configurable and can use both affair metadata and impor
 - PostgreSQL Full-Text Search
 - Flyway
 - Docker & Docker Compose
-- JDBC for import / ETL
+- JDBC für Import / ETL
 - Spring Data JPA
 - Spring Mail
+- Mailpit für lokale E-Mail-Tests
 - Vanilla HTML / CSS / JavaScript
 - Swagger / OpenAPI
 - GitHub Actions
@@ -69,7 +154,7 @@ Classification rules are configurable and can use both affair metadata and impor
 
 ---
 
-# Architecture
+# Architektur
 
 ```text
                          +----------------------+
@@ -109,76 +194,78 @@ Classification rules are configurable and can use both affair metadata and impor
                                                    Email Notifications
 
                          REST API / Swagger
-                                |
-                                v
+                               |
+                               v
                     Multilingual Web Interface
                          DE / FR / IT / EN
 ```
 
-The application separates external data integration, persistence, classification, monitoring, notification and presentation concerns.
+Die Anwendung trennt externe Datenintegration, Persistenz, Klassifikation, Monitoring, Benachrichtigung und Präsentation voneinander.
 
-AI functionality is intentionally not part of the critical MVP path.
-
----
-
-# Implemented Features
-
-## OpenParlData Integration
-
-- ✅ OpenParlData REST integration
-- ✅ Parliamentary affair import
-- ✅ Incremental affair synchronization
-- ✅ Parliamentary document import
-- ✅ Meeting import
-- ✅ Agenda item import
-- ✅ Affair/document relationships
-- ✅ Meeting/agenda relationships
-- ✅ Automatic import of affairs referenced by agenda items
-- ✅ Sync-state tracking
-- ✅ Scheduled data updates
-- ✅ Raw JSON persistence for imported data
+KI-Funktionalität ist bewusst nicht Teil des kritischen MVP-Pfads.
 
 ---
 
-## Data Management
+# Implementierte Funktionen
 
-- ✅ PostgreSQL persistence
-- ✅ Flyway database migrations
-- ✅ Normalized relational data model
-- ✅ JDBC-based import pipeline
-- ✅ Spring Data JPA read/write models where appropriate
-- ✅ Automated synchronization jobs
+## OpenParlData-Integration
 
----
-
-## WWF Topic Classification
-
-- ✅ Rule-based classification
-- ✅ Configurable YAML rules
-- ✅ German and French keyword rules
-- ✅ Affair title evaluation
-- ✅ Extended title evaluation
-- ✅ Imported document-content evaluation
-- ✅ Confidence score
-- ✅ Classification provenance
-- ✅ Multi-topic classification support
-- ✅ `SONSTIGES` fallback classification
-
-The classification engine is deterministic and does not require an external AI service.
+- ✅ OpenParlData REST-Integration
+- ✅ Import parlamentarischer Geschäfte
+- ✅ Inkrementelle Synchronisierung
+- ✅ Import parlamentarischer Dokumente
+- ✅ Import von Sitzungen
+- ✅ Import von Traktanden
+- ✅ Verknüpfung zwischen Geschäften und Dokumenten
+- ✅ Verknüpfung zwischen Sitzungen und Traktanden
+- ✅ Automatischer Import von Geschäften, die durch Traktanden referenziert werden
+- ✅ Verwaltung des Synchronisierungsstands
+- ✅ Geplante Datenaktualisierung
+- ✅ Speicherung importierter Rohdaten als JSON
+- ✅ Automatischer Docker-Bootstrap für neue lokale Installationen
 
 ---
 
-## Search and Filtering
+## Datenhaltung
 
-- ✅ Parliamentary affair search
-- ✅ WWF topic filtering
-- ✅ Keyword search
-- ✅ Combined keyword + topic filtering
+- ✅ PostgreSQL-Persistenz
+- ✅ Flyway-Datenbankmigrationen
+- ✅ Normalisiertes relationales Datenmodell
+- ✅ JDBC-basierte Import-Pipeline
+- ✅ Spring-Data-JPA-Modelle, wo sinnvoll
+- ✅ Automatisierte Synchronisierungsjobs
+- ✅ Persistente Docker-Volumes für lokale Daten
+
+---
+
+## WWF-Themenklassifikation
+
+- ✅ Regelbasierte Klassifikation
+- ✅ Konfigurierbare YAML-Regeln
+- ✅ Deutsche und französische Keyword-Regeln
+- ✅ Auswertung des Geschäftstitels
+- ✅ Auswertung des erweiterten Titels
+- ✅ Auswertung importierter Dokumentinhalte
+- ✅ Confidence Score
+- ✅ Klassifikationsherkunft / Provenance
+- ✅ Unterstützung mehrerer Themen pro Geschäft
+- ✅ `SONSTIGES` als Fallback-Klassifikation
+
+Die Klassifikationslogik ist deterministisch und benötigt keinen externen KI-Dienst.
+
+---
+
+## Suche und Filterung
+
+- ✅ Suche nach parlamentarischen Geschäften
+- ✅ Filterung nach WWF-Themen
+- ✅ Keyword-Suche
+- ✅ Kombination aus Keyword- und Themenfilter
 - ✅ Pagination
 - ✅ PostgreSQL Full-Text Search
-- ✅ GIN-indexed document search
+- ✅ GIN-indexierte Dokumentensuche
 
-Example:
+Beispiel:
 
 ```http
 GET /api/v1/affairs?q=Verkehr&limit=20&offset=0
@@ -186,392 +273,473 @@ GET /api/v1/affairs?q=Verkehr&limit=20&offset=0
 
 ---
 
-## Political Monitoring
+## Politisches Monitoring
 
-- ✅ Detection of new relevant parliamentary affairs
-- ✅ Monitoring of relevant session agenda items
-- ✅ Connection between agenda items and parliamentary affairs
-- ✅ WWF-topic-based relevance detection
-- ✅ Upcoming relevant agenda REST API
-- ✅ Monitoring views in the web interface
-
----
-
-## Email Subscriptions
-
-Users can subscribe to selected WWF topics without creating a password-based account.
-
-Implemented subscription lifecycle:
-
-- ✅ Select WWF topics
-- ✅ Subscribe using an email address
-- ✅ Email verification
-- ✅ Secure verification tokens
-- ✅ Subscription activation
-- ✅ Detection of already active subscriptions
-- ✅ Request secure management link
-- ✅ View current subscription
-- ✅ Update subscribed topics
-- ✅ Delete subscription
-- ✅ Complete removal of deleted subscription data
-- ✅ Token expiration
-- ✅ Hashed token storage
-
-Management links are sent by email instead of exposing subscription data through a public email lookup.
-
-If an active subscription already exists, the application informs the user and directs them to the subscription management workflow instead of creating a duplicate subscription.
-
-## Email Notifications
-
-- ✅ Alert generation
-- ✅ Recipient-specific alerts
-- ✅ Real email delivery
-- ✅ Notification status tracking
-- ✅ Retry support
-- ✅ Verification emails
-- ✅ Subscription activation confirmation
-- ✅ Secure management-link emails
-- ✅ Subscription update confirmation
-- ✅ Subscription cancellation confirmation
-- ✅ Notifications for relevant parliamentary developments
-
-SMTP credentials are configured through environment variables and are not stored in the repository.
+- ✅ Erkennung neuer relevanter parlamentarischer Geschäfte
+- ✅ Monitoring relevanter Sessionstraktanden
+- ✅ Verbindung zwischen Traktanden und parlamentarischen Geschäften
+- ✅ WWF-themenbasierte Relevanzerkennung
+- ✅ REST-API für bevorstehende relevante Traktanden
+- ✅ Monitoring-Ansichten in der Weboberfläche
 
 ---
 
-## Web Interface
+## E-Mail-Abonnements
 
-A lightweight frontend is included directly in the Spring Boot application.
+Benutzerinnen und Benutzer können ausgewählte WWF-Themen abonnieren, ohne ein passwortbasiertes Benutzerkonto erstellen zu müssen.
 
-No separate frontend framework or Node.js build is required.
+Implementierter Subscription-Lifecycle:
 
-Implemented:
+- ✅ WWF-Themen auswählen
+- ✅ Abonnement über eine E-Mail-Adresse anfordern
+- ✅ E-Mail-Verifikation
+- ✅ Sichere Verifikationstokens
+- ✅ Aktivierung des Abonnements
+- ✅ Erkennung bereits aktiver Abonnements
+- ✅ Sicheren Verwaltungslink anfordern
+- ✅ Bestehendes Abonnement anzeigen
+- ✅ Abonnierte Themen aktualisieren
+- ✅ Abonnement vollständig löschen
+- ✅ Sichere Token-Ablaufzeiten
+- ✅ Gehashte Token-Speicherung
 
-- ✅ Parliamentary affair overview
-- ✅ Search
-- ✅ WWF topic filtering
+Wenn für eine E-Mail-Adresse bereits ein aktives Abonnement besteht, wird kein zusätzliches Abonnement erstellt. Die Anwendung weist stattdessen darauf hin, das bestehende Abonnement über den Verwaltungsprozess zu bearbeiten.
+
+Verwaltungslinks werden per E-Mail versendet. Dadurch müssen Subscription-Daten nicht über eine öffentliche Suche anhand der E-Mail-Adresse bereitgestellt werden.
+
+---
+
+## E-Mail-Benachrichtigungen
+
+- ✅ Alert-Erzeugung
+- ✅ Empfängerspezifische Alerts
+- ✅ SMTP-basierter E-Mail-Versand
+- ✅ Tracking des Benachrichtigungsstatus
+- ✅ Retry-Unterstützung
+- ✅ Verifikations-E-Mails
+- ✅ Bestätigung der Subscription-Aktivierung
+- ✅ Sichere Verwaltungslinks per E-Mail
+- ✅ Bestätigung von Subscription-Änderungen
+- ✅ Bestätigung der Subscription-Löschung
+- ✅ Benachrichtigungen über relevante parlamentarische Entwicklungen
+- ✅ Lokaler E-Mail-Test mit Mailpit im Docker-Setup
+
+Für reale SMTP-Umgebungen werden Zugangsdaten über Umgebungsvariablen konfiguriert und nicht im Repository gespeichert.
+
+---
+
+## Weboberfläche
+
+Eine leichtgewichtige Weboberfläche ist direkt in die Spring-Boot-Anwendung integriert.
+
+Es wird kein separates Frontend-Framework und kein Node.js-Build benötigt.
+
+Implementiert:
+
+- ✅ Übersicht parlamentarischer Geschäfte
+- ✅ Suche
+- ✅ WWF-Themenfilter
 - ✅ Pagination
-- ✅ Upcoming relevant agenda items
-- ✅ Latest relevant affairs
-- ✅ Subscription creation
-- ✅ Subscription management
-- ✅ Affair detail page
-- ✅ Imported parliamentary document content
-- ✅ Links to original parliamentary sources/documents
-- ✅ Responsive layout
+- ✅ Bevorstehende relevante Traktanden
+- ✅ Neueste relevante Geschäfte
+- ✅ Erstellung von Themen-Abonnements
+- ✅ Verwaltung bestehender Abonnements
+- ✅ Detailansicht parlamentarischer Geschäfte
+- ✅ Anzeige importierter parlamentarischer Dokumentinhalte
+- ✅ Links zu Originalquellen und Dokumenten
+- ✅ Responsive Layout
 
 ---
 
-## Multilingual Interface
+## Mehrsprachige Benutzeroberfläche
 
-The application interface supports:
+Die Benutzeroberfläche unterstützt:
 
-- 🇩🇪 German
-- 🇫🇷 French
-- 🇮🇹 Italian
-- 🇬🇧 English
+- 🇩🇪 Deutsch
+- 🇫🇷 Französisch
+- 🇮🇹 Italienisch
+- 🇬🇧 Englisch
 
-The selected language is stored locally in the browser and remains active when navigating between the dashboard and affair detail pages.
+Die ausgewählte Sprache wird lokal im Browser gespeichert und bleibt beim Wechsel zwischen Dashboard und Detailansicht erhalten.
 
-Currently translated:
+Aktuell übersetzt sind unter anderem:
 
-- application navigation and labels
-- search/filter controls
-- subscription interface
-- status/error messages
-- WWF topic labels
-- dates
-- affair detail interface
-- document metadata
+- Navigation und Labels
+- Such- und Filterelemente
+- Subscription-Oberfläche
+- Status- und Fehlermeldungen
+- WWF-Themenbezeichnungen
+- Datumsdarstellung
+- Detailansicht parlamentarischer Geschäfte
+- Dokumentmetadaten
 
-Parliamentary source content itself is currently displayed in its original imported language.
+Parlamentarische Quellinhalte werden derzeit in der jeweils importierten Originalsprache dargestellt.
 
-Automatic translation of parliamentary content is considered an optional future extension.
+Eine automatische Übersetzung parlamentarischer Inhalte ist als optionale spätere Erweiterung vorgesehen.
 
 ---
 
-## REST API
+# REST-API
 
-The MVP exposes REST endpoints for its core functionality.
+Der MVP stellt REST-Endpunkte für seine Kernfunktionen bereit.
 
-### Affairs
+## Parlamentarische Geschäfte
 
 ```http
 GET /api/v1/affairs
 GET /api/v1/affairs/{id}
 ```
 
-Search/filter example:
+Beispiel für Suche und Filterung:
 
 ```http
 GET /api/v1/affairs?q=Verkehr&topic=Mobilität&limit=20&offset=0
 ```
 
-### Relevant Agenda Items
+## Relevante Traktanden
 
 ```http
 GET /api/v1/agendas/relevant
 ```
 
-Example:
+Beispiel:
 
 ```http
 GET /api/v1/agendas/relevant?limit=5&offset=0
 ```
 
-### Subscriptions
+## Subscriptions
 
-Create or request a subscription:
+Neue Subscription anfordern:
 
 ```http
 POST /api/v1/subscriptions
 ```
 
-Verify an email address:
+E-Mail-Adresse verifizieren:
 
 ```http
 GET /api/v1/subscriptions/verify?token=...
 ```
 
-Request a secure management link:
+Sicheren Verwaltungslink anfordern:
 
 ```http
 POST /api/v1/subscriptions/manage
 ```
 
-Load subscription using a management token:
+Subscription über einen Management-Token laden:
 
 ```http
 GET /api/v1/subscriptions/manage/{token}
 ```
 
-Update subscribed topics:
+Abonnierte Themen aktualisieren:
 
 ```http
 PUT /api/v1/subscriptions/manage/{token}
 ```
 
-Delete subscription:
+Subscription löschen:
 
 ```http
 DELETE /api/v1/subscriptions/manage/{token}
 ```
 
----
+Die vollständige interaktive API-Dokumentation steht über Swagger zur Verfügung.
 
-# Development Endpoints
-
-Development endpoints are available under:
+Docker:
 
 ```text
-/api/v1/dev/**
+http://localhost:8081/swagger-ui/index.html
 ```
 
-These endpoints support development and testing workflows such as imports, synchronization and alert processing.
-
-They are not intended to represent the public production API.
-
----
-
-# Local Development
-
-## Start PostgreSQL
-
-```bash
-docker compose up -d postgres
-```
-
-The Docker Compose PostgreSQL instance is exposed locally on port `5433`.
-
----
-
-## Run Application
-
-Using IntelliJ IDEA
-
-or:
-
-```bash
-./mvnw spring-boot:run
-```
-
----
-
-# Local URLs
-
-## Application
-
-```text
-http://localhost:8080
-```
-
-## Swagger / OpenAPI
+Lokale Entwicklung:
 
 ```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-## Health
+---
+
+# Development-Endpunkte
+
+Entwicklungsendpunkte stehen unter folgendem Pfad zur Verfügung:
+
+```text
+/api/v1/dev/**
+```
+
+Diese Endpunkte unterstützen Entwicklungs- und Testabläufe wie Import, Synchronisierung und Alert-Verarbeitung.
+
+Sie sind nicht als öffentliche Produktions-API vorgesehen.
+
+---
+
+# Alternative: Lokale Entwicklung mit IntelliJ oder Maven
+
+Der Docker-Quick-Start ist der einfachste Weg, um das gesamte System auszuführen.
+
+Für die aktive Entwicklung kann die Spring-Boot-Anwendung alternativ direkt über IntelliJ IDEA oder Maven gestartet werden.
+
+## Infrastruktur starten
+
+PostgreSQL kann über Docker gestartet werden:
+
+```bash
+docker compose up -d postgres
+```
+
+Die PostgreSQL-Instanz ist lokal über Port `5433` erreichbar.
+
+## Anwendung starten
+
+Über IntelliJ IDEA oder:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Bei dieser Variante läuft die Spring-Boot-Anwendung standardmässig auf:
+
+```text
+http://localhost:8080
+```
+
+Swagger:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+Health Endpoint:
 
 ```text
 http://localhost:8080/actuator/health
 ```
 
+> Der vollständige Docker-Quick-Start verwendet dagegen Port `8081` für die Anwendung.
+
 ---
 
-# Database
+# Datenbank
 
-Default local Docker development configuration:
+Standardkonfiguration der lokalen Docker-Datenbank:
 
-| Property | Value |
+| Eigenschaft | Wert |
 |---|---|
-| Host | localhost |
-| Port | 5433 |
-| Database | polit_assistant |
-| User | polit |
-| Password | polit_dev_password |
+| Host | `localhost` |
+| Port | `5433` |
+| Datenbank | `polit_assistant` |
+| Benutzer | `polit` |
+| Passwort | `polit_dev_password` |
 
-Production credentials must be supplied through environment-specific configuration and must not be committed to the repository.
+Die Daten werden in einem persistenten Docker-Volume gespeichert.
+
+Ein normales:
+
+```bash
+docker compose down
+```
+
+entfernt die Container, aber nicht den gespeicherten Datenbestand.
+
+Produktionszugangsdaten müssen über umgebungsspezifische Konfiguration bereitgestellt werden und dürfen nicht im Repository gespeichert werden.
 
 ---
 
-# Email Configuration
+# Docker-Bootstrap
 
-Email delivery is configured through Spring Mail environment variables.
+Bei einer neuen Docker-Installation prüft die Anwendung beim Start, ob bereits parlamentarische Geschäfte in der Datenbank vorhanden sind.
 
-Credentials and application passwords must never be committed to Git.
+Ist die Datenbank leer, wird automatisch ein kleiner Startdatenbestand aus OpenParlData importiert.
 
-The current MVP uses SMTP-based email delivery for verification, subscription management and monitoring notifications.
+Standardkonfiguration:
+
+```text
+APP_BOOTSTRAP_ENABLED=true
+APP_BOOTSTRAP_AFFAIR_LIMIT=50
+```
+
+Der Bootstrap importiert:
+
+1. parlamentarische Geschäfte
+2. zugehörige parlamentarische Dokumente
+3. WWF-Themenklassifikationen für die importierten Geschäfte
+
+Der Bootstrap erzeugt keine historischen Benachrichtigungen für diesen initialen Datenbestand.
+
+Ist die Datenbank bereits befüllt, wird der Bootstrap übersprungen.
+
+Dadurch kann dieselbe Docker-Konfiguration sowohl für eine neue Demo-Installation als auch für einen bereits vorhandenen lokalen Datenbestand verwendet werden.
 
 ---
 
-# Database Migrations
+# E-Mail-Konfiguration
 
-Database schema changes are managed through Flyway.
+Der E-Mail-Versand basiert auf Spring Mail.
 
-The current schema includes, among other things:
+## Docker / Demo
 
-- parliamentary affairs
-- parliamentary documents
-- classifications
-- meetings
-- agenda items
-- synchronization state
-- alerts
-- notification data
-- application users
-- user preferences
-- secure subscription tokens
+Im Docker-Quick-Start wird Mailpit verwendet:
+
+```text
+SMTP: mailpit:1025
+Weboberfläche: http://localhost:8025
+```
+
+Es werden keine externen SMTP-Zugangsdaten benötigt.
+
+## Reale SMTP-Umgebung
+
+Für einen realen E-Mail-Versand können SMTP-Zugangsdaten über Umgebungsvariablen bereitgestellt werden.
+
+Zugangsdaten, App-Passwörter und andere Secrets dürfen niemals in Git committed werden.
+
+Der MVP unterstützt SMTP-basierten E-Mail-Versand für:
+
+- E-Mail-Verifikation
+- Subscription-Verwaltung
+- Bestätigungs-E-Mails
+- Monitoring-Benachrichtigungen
+
+---
+
+# Datenbankmigrationen
+
+Änderungen am Datenbankschema werden über Flyway verwaltet.
+
+Das aktuelle Schema umfasst unter anderem:
+
+- parlamentarische Geschäfte
+- parlamentarische Dokumente
+- Klassifikationen
+- Sitzungen
+- Traktanden
+- Synchronisierungsstatus
+- Alerts
+- Benachrichtigungsdaten
+- Anwendungsbenutzer
+- Benutzerpräferenzen
+- sichere Subscription-Tokens
+
+Beim Docker-Quick-Start werden die Flyway-Migrationen automatisch ausgeführt.
 
 ---
 
 # Testing
 
-The project uses automated tests for backend functionality and Testcontainers where database integration is required.
+Das Projekt verwendet automatisierte Tests für Backend-Funktionalität sowie Testcontainers, wenn eine Datenbankintegration erforderlich ist.
 
-Before pushing changes:
+Vor dem Pushen von Änderungen:
 
 ```bash
 ./mvnw test
 ```
 
-A successful test run should be completed before merging changes into the main development branch.
+Ein erfolgreicher Testlauf sollte vor dem Zusammenführen von Änderungen durchgeführt werden.
+
+Zusätzlich können die zentralen MVP-Abläufe über die Weboberfläche und Swagger als End-to-End-Szenarien getestet werden.
 
 ---
 
 # Continuous Integration
 
-GitHub Actions is used for continuous integration.
+GitHub Actions wird für Continuous Integration verwendet.
 
-The CI workflow validates the project through automated build/test steps.
+Der CI-Workflow validiert das Projekt durch automatisierte Build- und Testschritte.
 
-The repository also contains Docker configuration for reproducible local execution.
+Das Repository enthält ausserdem eine Docker-Konfiguration für eine reproduzierbare lokale Ausführung.
 
 ---
 
-# Project Scope
+# Projektumfang
 
-The current MVP deliberately prioritizes a reliable working application over experimental AI functionality.
+Der aktuelle MVP priorisiert bewusst eine zuverlässige funktionierende Anwendung gegenüber experimenteller KI-Funktionalität.
 
 ## MVP
 
-- OpenParlData integration
-- structured parliamentary data storage
-- automatic data synchronization
-- rule-based WWF topic classification
-- search and filtering
-- relevant-affair monitoring
-- relevant agenda monitoring
-- email subscriptions
-- email notifications
-- REST API
-- simple web interface
-- multilingual user interface
+- OpenParlData-Integration
+- strukturierte Speicherung parlamentarischer Daten
+- automatische Datensynchronisierung
+- regelbasierte WWF-Themenklassifikation
+- Suche und Filterung
+- Monitoring relevanter Geschäfte
+- Monitoring relevanter Traktanden
+- E-Mail-Abonnements
+- E-Mail-Benachrichtigungen
+- REST-API
+- einfache Weboberfläche
+- mehrsprachige Benutzeroberfläche
 
-## Optional / Future Extensions
+## Optional / zukünftige Erweiterungen
 
-Possible later extensions include:
+Mögliche spätere Erweiterungen sind:
 
-- translation of parliamentary source content
-- AI-assisted classification
-- conversational access to parliamentary data
-- improved visualisations
-- additional notification channels
-- Microsoft 365 integration
-- more advanced relevance evaluation
+- automatische Übersetzung parlamentarischer Quellinhalte
+- KI-unterstützte Klassifikation
+- dialogorientierter Zugriff auf parlamentarische Daten
+- erweiterte Visualisierungen
+- zusätzliche Benachrichtigungskanäle
+- Microsoft-365-Integration
+- weiterführende Relevanzbewertung
 
-These extensions are not required for the current core MVP.
-
----
-
-# Current Project Status
-
-The project is currently in active MVP development.
-
-Completed core areas:
-
-- OpenParlData data integration
-- incremental synchronization
-- structured PostgreSQL persistence
-- document import
-- meeting and agenda import
-- rule-based WWF topic classification
-- PostgreSQL Full-Text Search
-- parliamentary affair REST API
-- relevant agenda monitoring
-- secure topic subscriptions
-- real email notifications
-- simple web frontend
-- affair detail view
-- multilingual DE / FR / IT / EN interface
-- Swagger / OpenAPI
-- Docker-based local infrastructure
-- CI pipeline
-
-Current focus:
-
-- frontend refinement and validation
-- end-to-end MVP testing
-- validation of classification results
-- documentation
-- preparation for stakeholder feedback
+Diese Erweiterungen sind für den aktuellen Kern-MVP nicht erforderlich.
 
 ---
 
-# Experimental Features
+# Aktueller Projektstand
 
-Experimental code may exist for conversational access / local LLM integration.
+Das Projekt befindet sich in der MVP-Validierungs- und Testphase.
 
-This functionality is currently **not part of the required MVP** and is not required to run or use the main application.
+Abgeschlossene Kernbereiche:
 
-The working MVP does not depend on a local LLM or an external AI provider.
+- ✅ OpenParlData-Datenintegration
+- ✅ Inkrementelle Synchronisierung
+- ✅ Strukturierte PostgreSQL-Persistenz
+- ✅ Dokumentimport
+- ✅ Import von Sitzungen und Traktanden
+- ✅ Regelbasierte WWF-Themenklassifikation
+- ✅ PostgreSQL Full-Text Search
+- ✅ REST-API für parlamentarische Geschäfte
+- ✅ Monitoring relevanter Traktanden
+- ✅ Sichere Themen-Abonnements
+- ✅ E-Mail-Benachrichtigungen
+- ✅ Einfache Weboberfläche
+- ✅ Detailansicht parlamentarischer Geschäfte
+- ✅ Mehrsprachige Benutzeroberfläche DE / FR / IT / EN
+- ✅ Swagger / OpenAPI
+- ✅ Docker-basierte lokale Infrastruktur
+- ✅ Zero-Configuration Docker Quick Start
+- ✅ Automatischer Bootstrap eines kleinen Startdatenbestands
+- ✅ Mailpit-basierte lokale E-Mail-Tests
+- ✅ CI-Pipeline
+
+Aktueller Fokus:
+
+- End-to-End-Tests des MVP anhand konkreter Anwendungsfälle
+- Validierung der Klassifikationsergebnisse
+- technische Dokumentation
+- Vorbereitung des Stakeholder-Feedbacks
 
 ---
 
-# Data Attribution
+# Experimentelle Funktionen
 
-Parliamentary data is provided by:
+Im Repository kann experimenteller Code für dialogorientierten Zugriff beziehungsweise lokale LLM-Integration vorhanden sein.
+
+Diese Funktionalität ist aktuell **nicht Bestandteil des erforderlichen MVP** und wird für den Betrieb der Hauptanwendung nicht benötigt.
+
+Der funktionierende MVP ist weder von einem lokalen LLM noch von einem externen KI-Anbieter abhängig.
+
+---
+
+# Datenquelle und Attribution
+
+Die parlamentarischen Daten werden bereitgestellt von:
 
 **OpenParlData.ch**
 
-OpenParlData data is used according to its applicable licence and attribution requirements.
+Die Daten von OpenParlData werden gemäss den jeweils geltenden Lizenz- und Attributionsbedingungen verwendet.
+
+**Source: OpenParlData.ch**

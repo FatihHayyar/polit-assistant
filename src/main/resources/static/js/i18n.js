@@ -88,6 +88,8 @@ const PolitI18n = (() => {
 
             subscriptionActivating:
                 "Abonnement wird aktiviert...",
+            subscriptionAlreadyActive:
+                "Für diese E-Mail-Adresse besteht bereits ein aktives Abonnement. Bitte verwalten Sie Ihre Einstellungen über «Bestehendes Abonnement verwalten».",
 
             pleaseWait:
                 "Bitte warten Sie einen Moment.",
@@ -293,8 +295,11 @@ const PolitI18n = (() => {
             subscriptionMailSent:
                 "Bitte prüfen Sie Ihr Postfach. Sie erhalten eine E-Mail mit den nächsten Schritten.",
 
+            noActiveSubscription:
+                "Für diese E-Mail-Adresse besteht kein aktives Abonnement.",
+
             managementMailSent:
-                "Falls für diese E-Mail-Adresse ein aktives Abonnement besteht, erhalten Sie einen sicheren Verwaltungslink per E-Mail.",
+                "Der Verwaltungslink wurde per E-Mail gesendet.",
 
             secureManagementMailSent:
                 "Zum Schutz Ihres Abonnements haben wir Ihnen einen sicheren Verwaltungslink per E-Mail gesendet.",
@@ -508,6 +513,9 @@ const PolitI18n = (() => {
             subscriptionActivating:
                 "Activation de l’abonnement...",
 
+            subscriptionAlreadyActive:
+                "Un abonnement actif existe déjà pour cette adresse e-mail. Veuillez gérer vos paramètres via «Gérer un abonnement existant».",
+
             pleaseWait:
                 "Veuillez patienter un instant.",
 
@@ -712,8 +720,11 @@ const PolitI18n = (() => {
             subscriptionMailSent:
                 "Veuillez consulter votre boîte de réception. Vous recevrez un e-mail avec les prochaines étapes.",
 
+            noActiveSubscription:
+                "Aucun abonnement actif n’existe pour cette adresse e-mail.",
+
             managementMailSent:
-                "Si un abonnement actif existe pour cette adresse e-mail, vous recevrez un lien de gestion sécurisé par e-mail.",
+                "Le lien de gestion a été envoyé par e-mail.",
 
             secureManagementMailSent:
                 "Pour protéger votre abonnement, nous vous avons envoyé un lien de gestion sécurisé par e-mail.",
@@ -927,6 +938,9 @@ const PolitI18n = (() => {
             subscriptionActivating:
                 "Attivazione dell’abbonamento...",
 
+            subscriptionAlreadyActive:
+                "Esiste già un abbonamento attivo per questo indirizzo e-mail. Gestisci le impostazioni tramite «Gestisci un abbonamento esistente».",
+
             pleaseWait:
                 "Attendi un momento.",
 
@@ -1131,8 +1145,11 @@ const PolitI18n = (() => {
             subscriptionMailSent:
                 "Controlla la tua casella di posta. Riceverai un’e-mail con i prossimi passaggi.",
 
+            noActiveSubscription:
+                "Non esiste alcun abbonamento attivo per questo indirizzo e-mail.",
+
             managementMailSent:
-                "Se esiste un abbonamento attivo per questo indirizzo e-mail, riceverai un link di gestione sicuro via e-mail.",
+                "Il link di gestione è stato inviato via e-mail.",
 
             secureManagementMailSent:
                 "Per proteggere il tuo abbonamento, ti abbiamo inviato un link di gestione sicuro via e-mail.",
@@ -1346,6 +1363,9 @@ const PolitI18n = (() => {
             subscriptionActivating:
                 "Activating subscription...",
 
+            subscriptionAlreadyActive:
+                "An active subscription already exists for this email address. Please manage your settings via “Manage existing subscription”.",
+
             pleaseWait:
                 "Please wait a moment.",
 
@@ -1550,8 +1570,11 @@ const PolitI18n = (() => {
             subscriptionMailSent:
                 "Please check your inbox. You will receive an email with the next steps.",
 
+            noActiveSubscription:
+                "There is no active subscription for this email address.",
+
             managementMailSent:
-                "If an active subscription exists for this email address, you will receive a secure management link by email.",
+                "The management link has been sent by email.",
 
             secureManagementMailSent:
                 "To protect your subscription, we sent you a secure management link by email.",

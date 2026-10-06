@@ -5,7 +5,6 @@ import ch.hslu.wipro.politassistant.adapter.out.persistence.user.AppUserJpaRepos
 import ch.hslu.wipro.politassistant.adapter.out.persistence.user.UserPreferenceEntity;
 import ch.hslu.wipro.politassistant.adapter.out.persistence.user.UserPreferenceJpaRepository;
 import ch.hslu.wipro.politassistant.application.port.out.NotificationSender;
-
 import ch.hslu.wipro.politassistant.domain.classification.Topic;
 import ch.hslu.wipro.politassistant.domain.notification.Notification;
 import ch.hslu.wipro.politassistant.domain.notification.NotificationChannel;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 @Service
 public class UserPreferenceService {
@@ -71,18 +69,15 @@ public class UserPreferenceService {
          * Instead, send a temporary management link.
          */
         if (user.isVerified() && user.isActive()) {
-            sendManagementLink(user);
-            return genericEmailResponse();
+            return new ActionResponse(
+                    "Für diese E-Mail-Adresse besteht bereits ein aktives Abonnement."
+            );
         }
 
         /*
-         * Important:
-         *
-         * For a pending or previously deactivated subscription, the newly
-         * submitted topic selection replaces the old selection completely.
-         *
-         * Without this cleanup, historical inactive preferences could be
-         * activated accidentally during verification.
+         * A pending or previously deactivated legacy subscription may still
+         * exist in the database. Its previous topic selection is replaced
+         * completely before a new verification process is started.
          */
         List<UserPreferenceEntity> oldPreferences =
                 preferencesFor(normalizedEmail);
@@ -131,7 +126,10 @@ public class UserPreferenceService {
                 )
         );
 
-        return genericEmailResponse();
+        return new ActionResponse(
+                "Eine Bestätigungs-E-Mail wurde gesendet. "
+                        + "Bitte bestätigen Sie Ihre E-Mail-Adresse, um das Abonnement zu aktivieren."
+        );
     }
 
     @Transactional
@@ -198,17 +196,45 @@ public class UserPreferenceService {
         String normalizedEmail =
                 normalizeEmail(email);
 
-        userRepository
-                .findByEmail(normalizedEmail)
-                .filter(AppUserEntity::isVerified)
-                .filter(AppUserEntity::isActive)
-                .ifPresent(this::sendManagementLink);
+        AppUserEntity user =
+                userRepository
+                        .findByEmail(normalizedEmail)
+                        .filter(AppUserEntity::isVerified)
+                        .filter(AppUserEntity::isActive)
+                        .orElse(null);
+
+        if (user == null) {
+            return new ActionResponse(
+                    "Für diese E-Mail-Adresse besteht kein aktives Abonnement."
+            );
+        }
 
         /*
-         * Always return the same response.
-         * This prevents disclosure of registered e-mail addresses.
+         * An active user should also have at least one active EMAIL
+         * preference. This prevents an inconsistent user record from being
+         * treated as a valid subscription.
          */
-        return genericEmailResponse();
+        boolean hasActiveEmailPreference =
+                preferenceRepository
+                        .findByUserId(user.getId())
+                        .stream()
+                        .anyMatch(preference ->
+                                preference.isActive()
+                                        && NotificationChannel.EMAIL.name()
+                                        .equals(preference.getChannel())
+                        );
+
+        if (!hasActiveEmailPreference) {
+            return new ActionResponse(
+                    "Für diese E-Mail-Adresse besteht kein aktives Abonnement."
+            );
+        }
+
+        sendManagementLink(user);
+
+        return new ActionResponse(
+                "Der Verwaltungslink wurde per E-Mail gesendet."
+        );
     }
 
     @Transactional(readOnly = true)
@@ -317,32 +343,58 @@ public class UserPreferenceService {
 
         ensureActiveUser(user);
 
-        preferencesFor(user.getEmail())
-                .forEach(UserPreferenceEntity::deactivate);
+        String email = user.getEmail();
+        String displayName = user.getDisplayName();
 
-        user.deactivate();
+        /*
+         * user_preferences uses NO ACTION for its foreign key to app_users.
+         * Therefore preferences must be physically removed first.
+         */
+        List<UserPreferenceEntity> preferences =
+                preferenceRepository.findByUserId(
+                        user.getId()
+                );
 
+        if (!preferences.isEmpty()) {
+            preferenceRepository.deleteAll(preferences);
+            preferenceRepository.flush();
+        }
+
+        /*
+         * subscription_tokens uses ON DELETE CASCADE, therefore deleting
+         * the user also removes all remaining verification/management tokens.
+         */
+        userRepository.delete(user);
+        userRepository.flush();
+
+        /*
+         * The confirmation is sent using the values copied before deletion.
+         * The user no longer needs to exist in the database for this mail.
+         */
         sendEmail(
-                user.getEmail(),
-                "WWF Polit-Assistant: Abonnement beendet",
+                email,
+                "WWF Polit-Assistant: Abonnement gelöscht",
                 """
                 Guten Tag %s
 
-                Ihr WWF-Themen-Abonnement wurde beendet.
+                Ihr WWF-Themen-Abonnement wurde vollständig gelöscht.
 
-                Sie erhalten keine weiteren Benachrichtigungen für dieses Abonnement.
+                Ihre E-Mail-Adresse und Ihre Themenauswahl werden nicht mehr
+                als aktives Abonnement im WWF Polit-Assistant geführt.
 
-                Sie können sich jederzeit erneut über den WWF Polit-Assistant anmelden.
+                Sie können sich jederzeit erneut anmelden. In diesem Fall
+                wird ein neues Abonnement erstellt und Ihre E-Mail-Adresse
+                erneut bestätigt.
 
                 Freundliche Grüsse
                 WWF Polit-Assistant
                 """.formatted(
-                        user.getDisplayName()
+                        displayName
                 )
         );
 
         return new ActionResponse(
-                "Das Abonnement wurde erfolgreich beendet."
+                "Das Abonnement wurde vollständig gelöscht."
         );
     }
 
@@ -367,7 +419,7 @@ public class UserPreferenceService {
 
                 Der Link ist 60 Minuten gültig.
 
-                Über diesen Link können Sie Ihre Themen aktualisieren oder Ihr Abonnement beenden.
+                Über diesen Link können Sie Ihre Themen aktualisieren oder Ihr Abonnement löschen.
 
                 Falls Sie diesen Link nicht angefordert haben, können Sie diese E-Mail ignorieren.
 
@@ -494,12 +546,6 @@ public class UserPreferenceService {
                                 left + System.lineSeparator() + right
                 )
                 .orElse("-");
-    }
-
-    private ActionResponse genericEmailResponse() {
-        return new ActionResponse(
-                "Falls für diese E-Mail-Adresse ein entsprechender Vorgang möglich ist, erhalten Sie eine E-Mail mit den nächsten Schritten."
-        );
     }
 
     private void sendEmail(

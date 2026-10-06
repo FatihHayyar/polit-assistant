@@ -86,13 +86,24 @@
     <div class="detail-container">
 
         <!-- BACK -->
+        <nav class="detail-navigation" aria-label="Navigation">
+            <a
+                    href="/"
+                    class="detail-back-button">
+        <span class="detail-back-icon" aria-hidden="true">
+            ←
+        </span>
 
-        <a
-                href="/"
-                class="detail-back-link"
-                data-i18n="backOverview">
-            ← Zurück zur Übersicht
-        </a>
+                <span class="detail-back-content">
+            <strong data-i18n="backOverview">
+                Zurück zur Übersicht
+            </strong>
+            <small>
+                WWF Polit-Assistant
+            </small>
+        </span>
+            </a>
+        </nav>
 
 
         <!-- LOADING / ERROR -->
@@ -267,27 +278,28 @@
             </section>
 
 
-            <!-- =============================================
-                 BOTTOM ACTIONS
-                 ============================================= -->
-
+            <!-- BOTTOM ACTIONS -->
             <section class="detail-bottom-actions">
 
                 <a
                         href="/"
-                        class="secondary-button"
-                        data-i18n="backOverview">
-                    ← Zurück zur Übersicht
+                        class="secondary-button detail-bottom-button">
+                    <span aria-hidden="true">←</span>
+                    <span data-i18n="backOverview">
+            Zurück zur Übersicht
+        </span>
                 </a>
 
                 <a
                         id="affair-source-link-bottom"
-                        class="primary-button"
+                        class="primary-button detail-bottom-button"
                         href="#"
                         target="_blank"
-                        rel="noopener noreferrer"
-                        data-i18n="originalSource">
-                    Originalquelle öffnen ↗
+                        rel="noopener noreferrer">
+        <span data-i18n="originalSource">
+            Originalquelle öffnen
+        </span>
+                    <span aria-hidden="true">↗</span>
                 </a>
 
             </section>
